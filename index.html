@@ -47,20 +47,14 @@
       overflow: hidden;
     }
 
-    .controls::-webkit-scrollbar { width: 6px; }
-    .controls::-webkit-scrollbar-track { background: var(--bg); }
-    .controls::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
     .controls {
       background: var(--panel);
       border-right: 1px solid var(--border);
       overflow-y: auto;
-      overflow-x: hidden;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      min-height: 0;
     }
 
     .section-title {
@@ -188,116 +182,6 @@
     #history-table tr:hover { background: var(--panel); }
     #history-table tr.active-row { background: rgba(99,102,241,0.15); }
 
-    /* ── OVERVIEW PANEL ── */
-    .overview-panel {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .overview-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 12px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      user-select: none;
-    }
-    .overview-header-left { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; }
-    .overview-toggle { font-size: 0.7rem; color: var(--muted); transition: transform 0.2s; }
-    .overview-toggle.open { transform: rotate(180deg); }
-    .overview-accent-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-    .overview-body { padding: 12px; display: flex; flex-direction: column; gap: 12px; }
-    .overview-body.hidden { display: none; }
-
-    .ov-section-label {
-      font-size: 0.65rem; font-weight: 800; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 5px;
-    }
-    .ov-text { font-size: 0.8rem; color: var(--text); line-height: 1.6; }
-    .ov-text em { color: var(--compare); font-style: normal; font-weight: 600; }
-
-    .ov-steps { display: flex; flex-direction: column; gap: 4px; }
-    .ov-step {
-      display: flex; gap: 8px; align-items: flex-start;
-      font-size: 0.78rem; color: var(--text); line-height: 1.5;
-    }
-    .ov-step-num {
-      min-width: 20px; height: 20px; border-radius: 50%;
-      background: var(--accent); color: #fff;
-      font-size: 0.65rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-
-    .complexity-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-    .cx-box {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 6px; padding: 8px; text-align: center;
-    }
-    .cx-label { font-size: 0.62rem; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
-    .cx-val { font-size: 0.82rem; font-weight: 700; font-family: var(--font-mono); }
-    .cx-val.best  { color: #22c55e; }
-    .cx-val.avg   { color: var(--compare); }
-    .cx-val.worst { color: #f87171; }
-
-    .cx-live {
-      background: var(--panel); border: 1px solid var(--accent);
-      border-radius: 6px; padding: 8px 10px;
-      font-size: 0.78rem; color: var(--text); line-height: 1.6;
-    }
-    .cx-live span { color: var(--accent); font-weight: 700; font-family: var(--font-mono); }
-
-    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
-    .badge {
-      padding: 3px 8px; border-radius: 99px;
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
-    }
-    .badge-green  { background: rgba(34,197,94,0.15);  color: #22c55e;  border: 1px solid rgba(34,197,94,0.3); }
-    .badge-blue   { background: rgba(99,102,241,0.15); color: #818cf8;  border: 1px solid rgba(99,102,241,0.3); }
-    .badge-yellow { background: rgba(245,158,11,0.15); color: #fbbf24;  border: 1px solid rgba(245,158,11,0.3); }
-    .badge-red    { background: rgba(248,113,113,0.15);color: #f87171;  border: 1px solid rgba(248,113,113,0.3); }
-
-    .paradigm-box {
-      background: rgba(99,102,241,0.07); border: 1px solid rgba(99,102,241,0.25);
-      border-radius: 6px; padding: 9px 11px;
-      font-size: 0.78rem; color: var(--text); line-height: 1.6;
-    }
-    .paradigm-box strong { color: var(--accent); }
-
-    .analogy-box {
-      background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
-      border-radius: 6px; padding: 10px 12px; line-height: 1.6;
-    }
-    .analogy-box strong { color: var(--compare); }
-
-    .terms-list { display: flex; flex-direction: column; gap: 5px; }
-    .term-row {
-      display: flex; gap: 8px; align-items: flex-start;
-      background: var(--panel); border-radius: 5px; padding: 6px 9px;
-      border-left: 3px solid var(--accent);
-    }
-    .term-key {
-      font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;
-      color: var(--accent); min-width: 70px; flex-shrink: 0; padding-top: 1px;
-    }
-    .term-def { font-size: 0.76rem; color: var(--text); line-height: 1.5; }
-
-    .faq-list { display: flex; flex-direction: column; gap: 8px; }
-    .faq-item {
-      background: var(--panel); border-radius: 6px;
-      border: 1px solid var(--border); overflow: hidden;
-    }
-    .faq-q {
-      font-size: 0.78rem; font-weight: 700; color: var(--text);
-      padding: 8px 10px; cursor: pointer;
-      border-bottom: 1px solid var(--border);
-      background: rgba(99,102,241,0.06);
-    }
-    .faq-a {
-      font-size: 0.76rem; color: var(--muted); line-height: 1.6;
-      padding: 8px 10px;
-    }
-
     @media (max-width: 980px) {
       .layout { grid-template-columns: 1fr; height: auto; overflow: auto; }
       .controls { border-right: none; border-bottom: 1px solid var(--border); }
@@ -400,18 +284,6 @@
         <div class="legend-item"><div class="legend-dot" style="background:var(--sorted)"></div>Placed / Sorted</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--highlight)"></div>Active Pointer</div>
       </div>
-    </div>
-
-    <!-- ── OVERVIEW PANEL ── -->
-    <div class="overview-panel">
-      <div class="overview-header" onclick="toggleOverview()">
-        <div class="overview-header-left">
-          <div class="overview-accent-dot" id="overview-dot"></div>
-          <span id="overview-title">Counting Sort — Overview</span>
-        </div>
-        <span class="overview-toggle open" id="overview-toggle">▼</span>
-      </div>
-      <div class="overview-body" id="overview-body"></div>
     </div>
 
   </aside>
@@ -774,7 +646,6 @@ function selectAlgo(algo) {
   document.getElementById('tab-radix').classList.toggle('active', algo === 'radix');
   reset();
   renderPseudo(-1);
-  renderOverview();
 }
 
 function loadPreset(arr) {
@@ -812,7 +683,6 @@ function buildSteps() {
   document.getElementById('cnt-n').textContent = arr.length;
   setPlaybackButtons(true);
   setStatus('Ready');
-  updateLiveComplexity(arr);
   stepForward();
 }
 
@@ -889,189 +759,9 @@ function setStatus(s) {
   document.getElementById('status-label').textContent = s;
 }
 
-// ── OVERVIEW PANEL ──
-const OVERVIEW = {
-  counting: {
-    analogy: '🗳️ <strong>Think of it like a vote tally.</strong> Imagine you\'re counting votes where each vote is a number from 0–9. Instead of sorting slips of paper by comparing them one-by-one, you just make 10 piles (one per digit) and drop each vote into its pile. At the end, you read the piles in order. Counting Sort does exactly this — it skips all comparisons by using the <em>value itself</em> as an address.',
-    core: 'Counting Sort is a sorting algorithm that <em>never compares two elements against each other</em>. Every other common sort (Bubble, Merge, Quick) works by asking "is A bigger than B?" over and over. Counting Sort takes a completely different approach: it counts how many times each number appears, figures out where each number must go mathematically, then places everything in one final sweep. Because it skips comparisons entirely, it can sort faster than the theoretical limit for comparison-based sorts.',
-    keyterms: [
-      { term: 'n', def: 'The number of elements in your input. E.g. [4,2,8,3] has n=4.' },
-      { term: 'k', def: 'The largest value in your input. E.g. [4,2,8,3] has k=8. The count array needs k+1 slots.' },
-      { term: 'Count Array C', def: 'A helper array where C[v] stores how many times value v appears in the input. Like tally marks.' },
-      { term: 'Prefix Sum', def: 'After counting, we transform C so C[v] = how many elements are ≤ v. This tells us the exact output position for each element.' },
-      { term: 'Stable Sort', def: 'If two elements have equal value, their original left-to-right order is preserved in the output. Counting Sort is stable because we scan right-to-left when placing.' },
-      { term: 'O(n+k)', def: 'The time it takes grows with n (input size) plus k (value range). If both are small, it\'s extremely fast — much faster than O(n log n) sorts.' },
-    ],
-    steps: [
-      '<strong>Find k (the max value).</strong> Scan your input once and note the largest number. This tells you how big the count array needs to be. Example: input [4,2,2,8,3] → k=8.',
-      '<strong>Build the Count Array C.</strong> Make an array of zeros with k+1 slots (index 0 to k). Then scan your input again: for each element, add 1 to that index in C. After this, C[v] = how many times value v appears. Example: C[2]=2, C[3]=1, C[4]=1, C[8]=1.',
-      '<strong>Convert C to Prefix Sums.</strong> Walk through C from left to right, adding each value to the previous. After this step, C[v] tells you how many elements are ≤ v — which is exactly the output position of the last copy of v. Example: C[4] = 4 means 4 elements are ≤ 4, so the last 4 goes to output index 3.',
-      '<strong>Place elements into output B.</strong> Scan your input right-to-left. For each element A[j]: look up C[A[j]], subtract 1 to get the output index, place A[j] there, then decrement C[A[j]]. Scanning right-to-left ensures equal elements keep their original order (stability).',
-      '<strong>Done!</strong> Array B is fully sorted. Total work: two scans of A (2n), one scan of C (k), one placement pass (n). Total: O(n+k).'
-    ],
-    best:  'Θ(n + k)',
-    avg:   'Θ(n + k)',
-    worst: 'Θ(n + k)',
-    space: 'O(n + k)',
-    complexityExplain: 'Unlike Bubble Sort O(n²) or Merge Sort O(n log n), Counting Sort\'s time is <em>always</em> Θ(n+k) — best, average, and worst case are identical. There is no "lucky" or "unlucky" arrangement. The cost only depends on input size (n) and value range (k). If k is small (e.g. sorting exam scores 0–100), this is extremely fast. If k is huge (e.g. k=1,000,000 but n=10), it wastes memory and time.',
-    badges: [
-      { label: '✔ Stable', cls: 'badge-green' },
-      { label: '✘ Not In-Place', cls: 'badge-red' },
-      { label: 'Non-Comparison Based', cls: 'badge-blue' },
-      { label: 'Linear Time', cls: 'badge-green' },
-      { label: 'Integers Only', cls: 'badge-yellow' },
-    ],
-    when: '<strong>✅ Great for:</strong> Sorting exam scores (0–100), ages (0–120), survey ratings (1–5), character codes (0–255), or any whole-number data where the range is manageable. Used in real-world systems like radix sort sub-routines, histogram generation, and frequency analysis.<br><br><strong>❌ Avoid when:</strong> Values are huge (sorting 10 numbers but max value is 1,000,000 — you\'d allocate 1 million slots of memory just for 10 numbers). Also doesn\'t work for negative numbers or non-integers without modification.',
-    paradigm: '<strong>How is this different from other sorts?</strong><br><br>Most sorting algorithms (Bubble, Merge, Quick, Heap) are <strong>comparison-based</strong> — they only ask "is A > B?" and rearrange based on the answer. Mathematicians proved that any comparison sort needs at least <em>n log n</em> comparisons in the worst case (called the Ω(n log n) lower bound).<br><br>Counting Sort <strong>cheats this limit</strong> by never asking "is A > B?" at all. Instead, it exploits the fact that our keys are integers — it uses each value as a direct index into memory. This is a fundamentally different approach called <strong>integer sorting</strong> or <strong>key-indexed counting</strong>.<br><br>It is <strong>NOT</strong> Divide & Conquer (no splitting into subproblems), <strong>NOT</strong> Greedy (no locally-optimal choices), and <strong>NOT</strong> Dynamic Programming (no overlapping subproblems). It\'s its own paradigm: counting and direct placement.',
-    faq: [
-      { q: 'Why scan right-to-left when placing elements?', a: 'To maintain stability. If two elements have the same value (e.g. two 3s), scanning right-to-left ensures the one that appeared later in the input ends up at a lower index — preserving their original order. This matters when sorting objects with multiple fields (e.g. sorting students by grade, where ties should keep alphabetical order).' },
-      { q: 'What if there are negative numbers?', a: 'The basic algorithm requires non-negative integers. For negative numbers, you find the minimum value, shift all elements up so the minimum becomes 0, sort, then shift back down. Most implementations handle this automatically.' },
-      { q: 'What does "O(n+k)" actually mean in plain English?', a: 'It means the time taken grows proportionally to (number of elements) + (largest value). If you double n, the time roughly doubles. If k is fixed (like scores always 0–100), then as n grows, k stops mattering and it becomes essentially O(n) — linear — the fastest possible.' },
-      { q: 'Is Counting Sort used in real software?', a: 'Yes! It\'s the internal sub-sort in Radix Sort, used in suffix arrays for string processing, genome sequencing tools, and anywhere frequency counting is needed. JavaScript\'s V8 engine has used non-comparison sorts for small integer arrays.' },
-    ]
-  },
-  radix: {
-    analogy: '📬 <strong>Think of it like sorting mail by zip code, one digit at a time.</strong> Instead of reading the whole zip code at once, a postal machine first sorts all mail by the last digit into 10 bins (0–9). Then it takes that result and sorts by the second-to-last digit into 10 bins again. After as many passes as there are digits, all the mail is perfectly sorted. Radix Sort works the same way with numbers.',
-    core: 'Radix Sort is a sorting algorithm that processes numbers <em>one digit at a time</em>, starting from the rightmost digit (ones) and working left (tens, hundreds, etc.). At each digit position, it uses Counting Sort as a helper to sort by just that one digit. After processing all digit positions, the entire array is sorted. Because it never compares full numbers against each other, it can beat the n log n speed limit of comparison sorts.',
-    keyterms: [
-      { term: 'n', def: 'The number of elements in your input.' },
-      { term: 'd', def: 'The number of digit positions in the largest number. E.g. max=802 has d=3 digits. More digits = more passes.' },
-      { term: 'LSD Radix Sort', def: 'Least Significant Digit first — starts sorting from the ones column. This is what this visualizer uses. Most common variant.' },
-      { term: 'Digit Pass', def: 'One full round of Counting Sort using only one digit position as the key. Radix Sort does exactly d passes.' },
-      { term: 'Stable Sub-sort', def: 'The Counting Sort at each pass MUST be stable — it must preserve equal elements\' order. Otherwise earlier passes get undone by later ones.' },
-      { term: 'O(d·(n+10))', def: 'Time = number of digit passes × (n + 10 digit buckets). If d is small and fixed, this simplifies to O(n) — linear time.' },
-    ],
-    steps: [
-      '<strong>Find d (number of digit positions).</strong> Look at the largest number in your input. Count its digits. That\'s how many passes you\'ll need. Example: max=802 → d=3, so you\'ll do 3 passes (ones, tens, hundreds).',
-      '<strong>Pass 1 — Sort by ones digit.</strong> Run Counting Sort using only the last digit (ones) of each number as the sort key. Buckets are 0–9. The array is now sorted by ones digit only. Example: [170,45,75,90,802,24,2,66] → sorted by ones → [170,90,802,2,24,45,75,66].',
-      '<strong>Pass 2 — Sort by tens digit.</strong> Run Counting Sort again, now using the tens digit as the key. Crucially, the sub-sort is stable — numbers with the same tens digit keep the order from Pass 1. Example: sorted by tens → [802,2,24,45,66,170,75,90].',
-      '<strong>Pass 3 — Sort by hundreds digit (and beyond if needed).</strong> Continue for each digit position. Numbers shorter than the current position are treated as having digit 0. After all d passes, the array is fully sorted.',
-      '<strong>Why does this work?</strong> Because each pass is stable, higher-priority digits (processed later) take precedence over lower-priority ones (processed earlier). It\'s like sorting a deck of cards first by suit, then by number — the number sort respects the earlier suit groupings.'
-    ],
-    best:  'Θ(d · (n + 10))',
-    avg:   'Θ(d · (n + 10))',
-    worst: 'Θ(d · (n + 10))',
-    space: 'O(n + 10)',
-    complexityExplain: 'Each of the d passes runs Counting Sort with 10 buckets (digits 0–9), costing O(n+10) per pass. Total: O(d·(n+10)). When d is a fixed constant (e.g. always sorting 4-digit numbers), this becomes O(n) — linear! Compare: Merge Sort always costs O(n log n) regardless. For large n with small d, Radix Sort wins. Space is only O(n+10) = O(n) because each pass reuses the same small count array.',
-    badges: [
-      { label: '✔ Stable', cls: 'badge-green' },
-      { label: '✘ Not In-Place', cls: 'badge-red' },
-      { label: 'Non-Comparison Based', cls: 'badge-blue' },
-      { label: 'Linear Time (fixed d)', cls: 'badge-green' },
-      { label: 'Integers Only', cls: 'badge-yellow' },
-    ],
-    when: '<strong>✅ Great for:</strong> Sorting large lists of fixed-width integers or strings — phone numbers, zip/postal codes, student IDs, IP addresses, dates (YYYYMMDD format), credit card numbers. Used heavily in database indexing, network routers sorting packet IDs, and suffix array construction for DNA sequencing.<br><br><strong>❌ Avoid when:</strong> Numbers vary wildly in digit count (d becomes large), when sorting floating-point or arbitrary objects, or when n is very small (overhead of multiple passes isn\'t worth it).',
-    paradigm: '<strong>How is this different from Merge Sort or Quick Sort?</strong><br><br><strong>Merge Sort (Divide & Conquer):</strong> Split the array in half, recursively sort each half, then merge them back — comparing elements at each merge. Always O(n log n).<br><br><strong>Quick Sort (Divide & Conquer):</strong> Pick a pivot, partition elements around it, recursively sort partitions — comparing elements to the pivot. Average O(n log n).<br><br><strong>Radix Sort:</strong> Never picks a pivot, never splits into recursive halves, never compares two full numbers. It processes one digit position at a time across the whole array. It exploits that numbers have <em>positional structure</em> (ones, tens, hundreds columns) — something comparison sorts ignore entirely.<br><br>This is why it\'s called a <strong>non-comparison sort</strong> — it bypasses the Ω(n log n) theoretical lower bound that all comparison-based algorithms are stuck with.',
-    faq: [
-      { q: 'Why sort least-significant digit FIRST instead of most-significant?', a: 'If you sorted most-significant first (MSD), earlier passes would be overwritten by later ones. Sorting LSD-first means the final pass (most significant digit) takes precedence — all else being equal, the earlier passes\' order is preserved by the stable sub-sort. Think of it like sorting names: sort by first name first (less important), then by last name (most important) — last-name ties are broken by earlier first-name ordering.' },
-      { q: 'What makes the sub-sort "stable" and why does it matter?', a: 'A stable sort preserves the relative order of equal elements. If Pass 1 determined that 24 comes before 45 (same ones digit, but we need to remember 24 was originally before 45), Pass 2 must keep that order when they land in the same tens bucket. A non-stable sub-sort would randomly scramble earlier work.' },
-      { q: 'Can Radix Sort handle strings or letters?', a: 'Yes! Letters have ASCII/Unicode codes (a=97, b=98, etc.), so you can treat each character as a "digit" in base 256. Radix Sort is used in suffix array construction — a key algorithm in DNA sequence matching and search engines.' },
-      { q: 'Is Radix Sort faster than Merge Sort in practice?', a: 'It depends. For n=1,000,000 integers with d=10 digits, Radix Sort does ~10 million operations vs Merge Sort\'s ~20 million. But Radix Sort has worse cache performance (jumping around memory). In practice for 32-bit integers, Radix Sort is often 2–3× faster than comparison sorts on modern hardware.' },
-    ]
-  }
-};
-
-function renderOverview() {
-  const ov = OVERVIEW[currentAlgo];
-  document.getElementById('overview-title').textContent =
-    (currentAlgo === 'counting' ? 'Counting Sort' : 'Radix Sort') + ' — Overview';
-  document.getElementById('overview-dot').style.background =
-    currentAlgo === 'counting' ? 'var(--accent)' : 'var(--compare)';
-
-  const body = document.getElementById('overview-body');
-  body.innerHTML = '';
-
-  function section(label, html) {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = '<div class="ov-section-label">' + label + '</div>' + html;
-    body.appendChild(wrap);
-  }
-
-  // Real-world analogy
-  section('💡 Real-World Analogy',
-    '<div class="analogy-box ov-text">' + ov.analogy + '</div>');
-
-  // Core idea
-  section('🧠 What Is It?',
-    '<div class="ov-text">' + ov.core + '</div>');
-
-  // Key terms
-  const termsHtml = ov.keyterms.map(function(t) {
-    return '<div class="term-row"><span class="term-key">' + t.term + '</span><span class="term-def">' + t.def + '</span></div>';
-  }).join('');
-  section('📖 Key Terms (Plain English)', '<div class="terms-list">' + termsHtml + '</div>');
-
-  // Steps
-  const stepsHtml = ov.steps.map(function(s, i) {
-    return '<div class="ov-step"><div class="ov-step-num">' + (i+1) + '</div><div class="ov-text" style="margin:0">' + s + '</div></div>';
-  }).join('');
-  section('🔢 How It Works — Step by Step', '<div class="ov-steps">' + stepsHtml + '</div>');
-
-  // Complexity
-  const cxGrid = '<div class="complexity-grid">' +
-    '<div class="cx-box"><div class="cx-label">Best Case</div><div class="cx-val best">' + ov.best + '</div></div>' +
-    '<div class="cx-box"><div class="cx-label">Average Case</div><div class="cx-val avg">' + ov.avg + '</div></div>' +
-    '<div class="cx-box"><div class="cx-label">Worst Case</div><div class="cx-val worst">' + ov.worst + '</div></div>' +
-    '</div>' +
-    '<div class="cx-box" style="margin-top:6px;text-align:left;padding:8px 10px"><div class="cx-label">Space (Memory) Used</div><div class="cx-val" style="color:var(--accent);font-size:0.82rem" id="cx-space">' + ov.space + '</div></div>' +
-    '<div class="ov-text" style="margin-top:6px;padding:8px;background:rgba(99,102,241,0.07);border-radius:6px;border:1px solid rgba(99,102,241,0.2)">' + ov.complexityExplain + '</div>' +
-    '<div class="cx-live" style="margin-top:6px" id="cx-live">Enter input and press <span>Build Steps</span> to see live complexity for your data.</div>';
-  section('⏱️ Speed & Complexity', cxGrid);
-
-  // Properties
-  const badgesHtml = '<div class="badges">' + ov.badges.map(function(b) {
-    return '<span class="badge ' + b.cls + '">' + b.label + '</span>';
-  }).join('') + '</div>';
-  section('🏷️ Properties', badgesHtml);
-
-  // When to use
-  section('📌 When To Use / When To Avoid',
-    '<div class="ov-text">' + ov.when + '</div>');
-
-  // Paradigm
-  section('🔬 Algorithm Paradigm & Comparison',
-    '<div class="paradigm-box">' + ov.paradigm + '</div>');
-
-  // FAQ
-  const faqHtml = ov.faq.map(function(f) {
-    return '<div class="faq-item"><div class="faq-q">❓ ' + f.q + '</div><div class="faq-a">' + f.a + '</div></div>';
-  }).join('');
-  section('🙋 Common Questions', '<div class="faq-list">' + faqHtml + '</div>');
-}
-
-function updateLiveComplexity(arr) {
-  const n = arr.length;
-  const k = Math.max(...arr);
-  const maxVal = k;
-  const d = maxVal === 0 ? 1 : (Math.floor(Math.log10(maxVal)) + 1);
-  const liveEl = document.getElementById('cx-live');
-  if (currentAlgo === 'counting') {
-    const ops = n + k;
-    liveEl.innerHTML =
-      '📊 Your input: n=<span>' + n + '</span>, k=<span>' + k + '</span> → ' +
-      'O(n+k) = O(<span>' + n + '+' + k + '</span>) = <span>' + ops + '</span> operations. ' +
-      (k > 10 * n ? '⚠️ k ≫ n here — range is large relative to input size.' :
-       k <= n ? '✅ k ≤ n — very efficient for this input!' :
-       '✅ Reasonable ratio of n to k.');
-  } else {
-    const ops = d * (n + 10);
-    liveEl.innerHTML =
-      '📊 Your input: n=<span>' + n + '</span>, max=<span>' + maxVal + '</span>, d=<span>' + d + '</span> digit(s) → ' +
-      'O(d·(n+10)) = O(<span>' + d + '×(' + n + '+10)</span>) = <span>' + ops + '</span> operations.';
-  }
-}
-
-function toggleOverview() {
-  const body = document.getElementById('overview-body');
-  const toggle = document.getElementById('overview-toggle');
-  body.classList.toggle('hidden');
-  toggle.classList.toggle('open');
-}
-
 // ── INIT ──
 updateSpeed();
 renderPseudo(-1);
-renderOverview();
 </script>
 </body>
 </html>
