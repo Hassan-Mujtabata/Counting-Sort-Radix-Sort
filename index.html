@@ -47,14 +47,20 @@
       overflow: hidden;
     }
 
+    .controls::-webkit-scrollbar { width: 6px; }
+    .controls::-webkit-scrollbar-track { background: var(--bg); }
+    .controls::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
     .controls {
       background: var(--panel);
       border-right: 1px solid var(--border);
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      min-height: 0;
     }
 
     .section-title {
