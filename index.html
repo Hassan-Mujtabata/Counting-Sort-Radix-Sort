@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Counting Sort & Radix Sort Visualizer</title>
+  <title>Counting Sort &amp; Radix Sort — Visualizer</title>
   <style>
     :root {
       --bg:        #0f1117;
@@ -20,227 +20,226 @@
       --font-mono: 'Courier New', Courier, monospace;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height: 100%; overflow-y: scroll; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100%; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; }
 
-    header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
-    header h1 { font-size: 1.2rem; font-weight: 700; }
-    header span { font-size: 0.8rem; color: var(--muted); }
+    /* ── HEADER ── */
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    header h1 { font-size: 1.15rem; font-weight: 700; }
+    header span { font-size: 0.78rem; color: var(--muted); }
 
-    .layout { display: flex; min-height: calc(100vh - 55px); }
-    .controls { position: fixed; top: 55px; left: 0; width: 420px; height: calc(100vh - 55px); background: var(--panel); border-right: 1px solid var(--border); overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 16px; z-index: 10; }
-    .viz-panel { margin-left: 420px; flex: 1; display: flex; flex-direction: column; min-height: calc(100vh - 55px); }
+    /* ── TWO-COLUMN LAYOUT ── */
+    .layout { display: flex; flex: 1; overflow: hidden; }
 
-    .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    /* ── CONTROLS (left) ── */
+    .controls {
+      width: 400px;
+      flex-shrink: 0;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── VIZ PANEL (right) ── */
+    .viz-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* ── CONTROLS INTERNALS ── */
+    .section-title {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 6px;
+    }
     .tabs { display: flex; gap: 6px; }
-    .tab { flex: 1; padding: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); font-size: 0.82rem; cursor: pointer; text-align: center; transition: all 0.15s; }
+    .tab {
+      flex: 1; padding: 8px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--muted); font-size: 0.82rem;
+      cursor: pointer; text-align: center; transition: all 0.15s;
+    }
     .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 
-    label { font-size: 0.82rem; color: var(--muted); display: block; margin-bottom: 4px; }
-    input[type="text"] { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); padding: 8px 10px; font-size: 0.9rem; }
+    label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 4px; }
+    input[type="text"] {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); padding: 7px 10px; font-size: 0.88rem;
+    }
     input[type="text"]:focus { outline: none; border-color: var(--accent); }
-    .error-msg { font-size: 0.75rem; color: #f87171; margin-top: 4px; display: none; }
+    .error-msg { font-size: 0.73rem; color: #f87171; margin-top: 3px; display: none; }
     .error-msg.visible { display: block; }
 
-    .presets { display: flex; flex-direction: column; gap: 6px; }
-    .preset-btn { padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 0.8rem; cursor: pointer; text-align: left; transition: border-color 0.15s; }
+    .presets { display: flex; flex-direction: column; gap: 5px; }
+    .preset-btn {
+      padding: 6px 10px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); font-size: 0.78rem;
+      cursor: pointer; text-align: left; transition: border-color 0.15s;
+    }
     .preset-btn:hover { border-color: var(--accent); }
 
-    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-row { display: flex; align-items: center; gap: 8px; }
     input[type="range"] { flex: 1; accent-color: var(--accent); }
-    .speed-label { font-size: 0.85rem; color: var(--accent); min-width: 40px; text-align: right; }
+    .speed-label { font-size: 0.83rem; color: var(--accent); min-width: 38px; text-align: right; }
 
-    .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
-    button.ctrl { flex: 1; min-width: 60px; padding: 9px 4px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .btn-row { display: flex; gap: 5px; flex-wrap: wrap; }
+    button.ctrl {
+      flex: 1; min-width: 55px; padding: 8px 4px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: var(--radius); color: var(--text);
+      font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
     button.ctrl:hover { border-color: var(--accent); color: var(--accent); }
     button.ctrl.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
     button.ctrl:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .status-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); }
+    .status-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-top: 7px; }
     #status-label { color: var(--compare); font-weight: 600; }
 
-    .counters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .counter-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; text-align: center; }
-    .counter-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
-    .counter-lbl { font-size: 0.7rem; color: var(--muted); }
+    .counters { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .counter-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px; text-align: center; }
+    .counter-val { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+    .counter-lbl { font-size: 0.67rem; color: var(--muted); margin-top: 2px; }
 
-    .legend { display: flex; flex-wrap: wrap; gap: 8px; }
-    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: var(--muted); }
-    .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 7px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.73rem; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
+    /* Overview collapsible */
     .ov-wrap { border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-code); overflow: hidden; }
-    .ov-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; cursor: pointer; user-select: none; background: rgba(99,102,241,0.08); border-bottom: 1px solid var(--border); }
+    .ov-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; cursor: pointer; user-select: none;
+      background: rgba(99,102,241,0.08); border-bottom: 1px solid var(--border);
+    }
     .ov-header:hover { background: rgba(99,102,241,0.14); }
     .ov-header-left { display: flex; align-items: center; gap: 7px; }
-    .ov-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-    .ov-title { font-size: 0.8rem; font-weight: 700; color: #818cf8; }
-    .ov-arrow { font-size: 0.65rem; color: var(--muted); transition: transform 0.2s; display: inline-block; }
+    .ov-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    .ov-title { font-size: 0.78rem; font-weight: 700; color: #818cf8; }
+    .ov-arrow { font-size: 0.62rem; color: var(--muted); transition: transform 0.2s; display: inline-block; }
     .ov-arrow.open { transform: rotate(180deg); }
-    .ov-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .ov-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
     .ov-body.hidden { display: none; }
-    .ov-lbl { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--compare); margin-bottom: 3px; }
-    .ov-text { font-size: 0.77rem; color: #94a3b8; line-height: 1.6; }
-    .ov-steps { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-    .ov-steps li { font-size: 0.76rem; color: #94a3b8; line-height: 1.5; padding-left: 14px; position: relative; }
-    .ov-steps li::before { content: '▸'; position: absolute; left: 0; top: 2px; color: var(--accent); font-size: 0.62rem; }
-    .ov-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-    .ov-tag { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; border: 1px solid; }
+    .ov-lbl { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--compare); margin-bottom: 2px; }
+    .ov-text { font-size: 0.75rem; color: #94a3b8; line-height: 1.6; }
+    .ov-steps { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+    .ov-steps li { font-size: 0.74rem; color: #94a3b8; line-height: 1.5; padding-left: 13px; position: relative; }
+    .ov-steps li::before { content: '▸'; position: absolute; left: 0; top: 2px; color: var(--accent); font-size: 0.6rem; }
+    .ov-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .ov-tag { font-size: 0.63rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; border: 1px solid; }
     .ov-tag.g { background: rgba(34,197,94,0.1);  border-color: rgba(34,197,94,0.35);  color: #22c55e; }
     .ov-tag.a { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.35); color: #f59e0b; }
     .ov-tag.b { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.35); color: #818cf8; }
     .ov-tag.r { background: rgba(239,68,68,0.1);  border-color: rgba(239,68,68,0.35);  color: #ef4444; }
 
+    /* Complexity panel */
     .cx-wrap { border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-code); overflow: hidden; }
-    .cx-header { display: flex; align-items: center; gap: 7px; padding: 9px 12px; background: rgba(245,158,11,0.07); border-bottom: 1px solid var(--border); }
-    .cx-title { font-size: 0.8rem; font-weight: 700; color: #f59e0b; }
-    .cx-body { padding: 12px; }
-    .cx-algo-name { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #818cf8; margin-bottom: 8px; }
-    .cx-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-    .cx-table th { text-align: left; color: var(--muted); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 6px 5px; border-bottom: 1px solid var(--border); }
-    .cx-table td { padding: 5px 6px; border-bottom: 1px solid rgba(46,51,71,0.5); }
+    .cx-header { display: flex; align-items: center; gap: 7px; padding: 8px 12px; background: rgba(245,158,11,0.07); border-bottom: 1px solid var(--border); }
+    .cx-title { font-size: 0.78rem; font-weight: 700; color: #f59e0b; }
+    .cx-body { padding: 10px 12px; }
+    .cx-algo-name { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #818cf8; margin-bottom: 7px; }
+    .cx-table { width: 100%; border-collapse: collapse; font-size: 0.73rem; }
+    .cx-table th { text-align: left; color: var(--muted); font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 5px 5px; border-bottom: 1px solid var(--border); }
+    .cx-table td { padding: 4px 5px; border-bottom: 1px solid rgba(46,51,71,0.5); }
     .cx-table tr:last-child td { border-bottom: none; }
-    .cx-case { color: var(--muted); font-size: 0.71rem; }
-    .cx-val { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; }
+    .cx-case { color: var(--muted); font-size: 0.69rem; }
+    .cx-val { font-family: var(--font-mono); font-size: 0.73rem; font-weight: 600; }
     .cx-val.g { color: #22c55e; } .cx-val.a { color: #f59e0b; }
-    .cx-note { font-size: 0.65rem; color: #475569; font-style: italic; }
-    .cx-sep { height: 1px; background: var(--border); margin: 10px 0; }
-    .cx-live-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-    .cx-live { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-    .cx-live-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 6px; text-align: center; }
-    .cx-live-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
-    .cx-live-lbl { font-size: 0.59rem; color: var(--muted); margin-top: 2px; }
+    .cx-note { font-size: 0.63rem; color: #475569; font-style: italic; }
+    .cx-sep { height: 1px; background: var(--border); margin: 8px 0; }
+    .cx-live-title { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .cx-live { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+    .cx-live-box { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 6px 5px; text-align: center; }
+    .cx-live-val { font-size: 1.05rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
+    .cx-live-lbl { font-size: 0.57rem; color: var(--muted); margin-top: 2px; }
 
-    .viz-legend-bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 7px 16px; background: var(--panel); border-bottom: 1px solid var(--border); font-size: 0.73rem; }
+    /* ── VIZ PANEL INTERNALS ── */
+    .viz-legend-bar {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 6px 16px; background: var(--panel); border-bottom: 1px solid var(--border);
+      font-size: 0.71rem; flex-shrink: 0;
+    }
     .vlb-item { display: flex; align-items: center; gap: 5px; color: var(--muted); white-space: nowrap; }
     .vlb-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
-    .viz-main { display: grid; grid-template-columns: 1fr 280px; height: 480px; border-bottom: 1px solid var(--border); }
+    /* Main viz area: SVG + pseudocode side by side */
+    .viz-main {
+      display: grid;
+      grid-template-columns: 1fr 270px;
+      flex: 1;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
     #viz-container { background: var(--bg); overflow: hidden; position: relative; border-right: 1px solid var(--border); }
     #viz-svg { width: 100%; height: 100%; }
 
-    /* ── SVG BAR ANIMATION ── */
-    #viz-svg .v-bar { transition: fill 0.22s ease; }
-    #viz-svg .v-bar-label { transition: fill 0.15s ease; }
-    #viz-svg .v-ptr { transition: opacity 0.18s ease; }
+    /* SVG transitions */
+    #viz-svg .v-bar   { transition: fill 0.22s ease; }
+    #viz-svg .v-ptr   { transition: opacity 0.18s ease; }
     #viz-svg .v-ccell { transition: fill 0.22s ease; }
 
-    #pseudo-panel { background: var(--bg-code); overflow-y: auto; padding: 10px; font-family: var(--font-mono); font-size: 0.78rem; }
-    .pseudo-line { display: flex; gap: 10px; padding: 3px 6px; border-radius: 4px; cursor: default; transition: background 0.15s; position: relative; }
-    .pseudo-line .ln { color: var(--muted); user-select: none; min-width: 18px; }
+    /* Pseudocode */
+    #pseudo-panel {
+      background: var(--bg-code); overflow-y: auto; padding: 10px;
+      font-family: var(--font-mono); font-size: 0.77rem;
+    }
+    .pseudo-line {
+      display: flex; gap: 10px; padding: 3px 6px; border-radius: 4px;
+      cursor: default; transition: background 0.15s; position: relative;
+    }
+    .pseudo-line .ln { color: var(--muted); user-select: none; min-width: 16px; }
     .pseudo-line.active { background: rgba(99,102,241,0.3); }
     .pseudo-line:hover .tip { display: block; }
-    .tip { display: none; position: absolute; bottom: calc(100% + 4px); left: 0; background: #1e2235; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.72rem; color: var(--text); white-space: nowrap; z-index: 999; pointer-events: none; font-family: 'Segoe UI', sans-serif; }
+    .tip {
+      display: none; position: absolute; bottom: calc(100% + 4px); left: 0;
+      background: #1e2235; border: 1px solid var(--border); border-radius: 6px;
+      padding: 4px 8px; font-size: 0.7rem; color: var(--text); white-space: nowrap;
+      z-index: 999; pointer-events: none; font-family: 'Segoe UI', sans-serif;
+    }
 
-    #step-box { background: var(--panel); border-top: 1px solid var(--border); padding: 10px 16px; font-size: 0.85rem; color: var(--text); min-height: 42px; }
+    /* Step explanation box */
+    #step-box {
+      background: var(--panel); border-bottom: 1px solid var(--border);
+      padding: 9px 16px; font-size: 0.83rem; color: var(--text);
+      min-height: 40px; flex-shrink: 0;
+    }
     #step-box span { color: var(--compare); font-weight: 600; }
 
-    .bottom-strip { border-top: 1px solid var(--border); height: 220px; overflow: hidden; }
+    /* History table */
+    .history-strip { height: 160px; overflow: hidden; flex-shrink: 0; }
     #history-panel { overflow-y: auto; background: var(--bg); height: 100%; }
-    #history-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-    #history-table th { background: var(--panel); border-bottom: 1px solid var(--border); padding: 6px 10px; text-align: left; color: var(--muted); position: sticky; top: 0; z-index: 1; }
-    #history-table td { padding: 5px 10px; border-bottom: 1px solid var(--border); }
+    #history-table { width: 100%; border-collapse: collapse; font-size: 0.73rem; }
+    #history-table th {
+      background: var(--panel); border-bottom: 1px solid var(--border);
+      padding: 5px 10px; text-align: left; color: var(--muted);
+      position: sticky; top: 0; z-index: 1; font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    #history-table td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
     #history-table tr { cursor: pointer; transition: background 0.1s; }
     #history-table tr:hover { background: var(--panel); }
     #history-table tr.active-row { background: rgba(99,102,241,0.15); }
 
-    @media (max-width: 980px) {
-      .controls { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-      .viz-panel { margin-left: 0; }
-      .layout { flex-direction: column; }
-      .viz-main { grid-template-columns: 1fr; height: auto; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; overflow: auto; }
+      .controls { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+      html, body { height: auto; overflow: auto; }
+      .viz-main { grid-template-columns: 1fr; }
       #pseudo-panel { height: 180px; border-top: 1px solid var(--border); }
-      .edu-two-col, .edu-three-col, .paradigm-grid, .run-results, .impact-wrap { grid-template-columns: 1fr !important; }
-      .edu-sec-body { padding: 14px 16px; }
     }
-
-    .edu-sections { border-top: 2px solid var(--border); width: 100%; }
-    .edu-section { border-top: 1px solid var(--border); width: 100%; }
-    .edu-sec-header { font-size: 1rem; font-weight: 700; padding: 16px 28px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; letter-spacing: 0.01em; }
-    .edu-sec-header.clo1 { color: #818cf8; border-left: 4px solid #6366f1; }
-    .edu-sec-header.clo2 { color: #34d399; border-left: 4px solid #10b981; }
-    .edu-sec-header.clo3 { color: #fb923c; border-left: 4px solid #f97316; }
-    .edu-sec-header.edu-hdr { color: #e2e8f0; border-left: 4px solid #64748b; }
-    .edu-sec-body { padding: 22px 28px; display: flex; flex-direction: column; gap: 18px; }
-    .edu-two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; min-width: 0; }
-    .edu-three-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; min-width: 0; }
-    .edu-two-col > *, .edu-three-col > * { min-width: 0; overflow: hidden; }
-
-    .edu-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
-    .edu-card.al { border-left: 3px solid #22c55e; }
-    .edu-card.aa { border-left: 3px solid #f59e0b; }
-    .edu-card.ar { border-left: 3px solid #ef4444; }
-    .edu-card.ai { border-left: 3px solid #6366f1; }
-    .edu-card-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
-    .edu-card-text { font-size: 0.78rem; color: #94a3b8; line-height: 1.65; }
-    .edu-step { display: flex; gap: 10px; margin-bottom: 9px; align-items: flex-start; }
-    .edu-step-num { background: var(--accent); color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-    .edu-step-text { font-size: 0.77rem; color: #94a3b8; line-height: 1.65; }
-    .edu-step-text code { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: var(--font-mono); font-size: 0.74rem; color: #a78bfa; }
-    .key-concept { margin-bottom: 10px; }
-    .kc-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #22c55e; margin-bottom: 3px; }
-    .kc-text { font-size: 0.77rem; color: #94a3b8; line-height: 1.6; }
-    .mistake-item { margin-bottom: 9px; display: flex; gap: 8px; align-items: flex-start; }
-    .mi-x { color: #ef4444; font-weight: 700; flex-shrink: 0; font-size: 0.85rem; line-height: 1.4; }
-    .mi-text { font-size: 0.77rem; color: #94a3b8; line-height: 1.6; }
-
-    .chart-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
-    .chart-controls { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
-    .chart-controls label { font-size: 0.78rem; color: var(--muted); }
-    .chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
-    .cl-item { display: flex; align-items: center; gap: 6px; font-size: 0.73rem; color: var(--muted); }
-    .cl-line { width: 22px; height: 3px; border-radius: 2px; }
-    canvas#growth-chart { width: 100%; height: 240px; display: block; }
-
-    .run-input-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .run-input-row input { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); padding: 7px 10px; font-size: 0.88rem; flex: 1; min-width: 200px; }
-    .run-btn { padding: 8px 18px; background: var(--accent); border: none; border-radius: var(--radius); color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
-    .run-btn:hover { background: #4f46e5; }
-    .run-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; min-width: 0; }
-    .run-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; min-width: 0; }
-    .run-box-title { font-size: 0.78rem; font-weight: 700; margin-bottom: 10px; }
-    .run-box-title.cs { color: #818cf8; } .run-box-title.qs { color: #f59e0b; }
-    .run-stat { display: flex; justify-content: space-between; font-size: 0.76rem; margin-bottom: 5px; color: #94a3b8; }
-    .run-stat span { font-weight: 700; font-family: var(--font-mono); }
-    .run-stat span.win { color: #22c55e; } .run-stat span.lose { color: #ef4444; }
-    .run-bar-row { margin-top: 10px; }
-    .run-bar-bg { background: var(--panel); border-radius: 3px; height: 8px; overflow: hidden; margin-bottom: 4px; }
-    .run-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
-
-    .impact-wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; min-width: 0; }
-    .impact-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; min-width: 0; }
-    .impact-box-title { font-size: 0.78rem; font-weight: 700; margin-bottom: 10px; }
-    .impact-box-title.ok { color: #22c55e; } .impact-box-title.bad { color: #ef4444; }
-    .impact-arr { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
-    .ic { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 5px; font-size: 0.82rem; font-weight: 700; border: 1px solid var(--border); font-family: var(--font-mono); }
-    .ic.ok { background: rgba(34,197,94,0.12); color: #22c55e; border-color: rgba(34,197,94,0.3); }
-    .ic.bad { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.3); }
-    .ic.n { background: rgba(99,102,241,0.1); color: #818cf8; border-color: rgba(99,102,241,0.2); }
-    .impact-note { font-size: 0.74rem; color: #94a3b8; line-height: 1.6; }
-
-    .paradigm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-    .pg-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
-    .pg-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.65rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-bottom: 8px; }
-    .pg-badge.yes { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
-    .pg-badge.no  { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-    .pg-name { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .pg-text { font-size: 0.75rem; color: #64748b; line-height: 1.6; }
-    .pg-card.dim { opacity: 0.6; }
-
-    .dt-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow: hidden; }
-    .dt-wrap svg, .edu-card svg { max-width: 100%; height: auto; display: block; }
-    .dt-title { font-size: 0.78rem; font-weight: 700; color: #818cf8; margin-bottom: 12px; }
-    .dt-note { font-size: 0.75rem; color: #94a3b8; line-height: 1.6; margin-top: 10px; }
-
-    .ce-table-wrap { overflow-x: auto; }
-    .ce-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
-    .ce-table th { background: var(--panel); padding: 7px 10px; text-align: left; color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
-    .ce-table td { padding: 7px 10px; border-bottom: 1px solid rgba(46,51,71,0.4); font-family: var(--font-mono); font-size: 0.77rem; }
-    .ce-table tr:last-child td { border-bottom: none; }
-    .ce-table .good { color: #22c55e; } .ce-table .bad { color: #ef4444; }
-    .section-badge { display: inline-block; font-size: 0.62rem; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
-    .sb-clo1 { background: rgba(99,102,241,0.15); color: #818cf8; }
-    .sb-clo2 { background: rgba(16,185,129,0.15); color: #34d399; }
-    .sb-clo3 { background: rgba(249,115,22,0.15); color: #fb923c; }
   </style>
 </head>
 <body>
@@ -252,7 +251,9 @@
 
 <div class="layout">
 
+  <!-- ── LEFT: CONTROLS ── -->
   <aside class="controls">
+
     <div>
       <div class="section-title">Algorithm</div>
       <div class="tabs">
@@ -263,7 +264,7 @@
 
     <div>
       <div class="section-title">Custom Input</div>
-      <label>Comma-separated non-negative integers (max value: 9999)</label>
+      <label>Comma-separated non-negative integers (max 9999)</label>
       <input type="text" id="custom-input" value="4, 2, 2, 8, 3, 3, 1" oninput="validateInput()" />
       <div class="error-msg" id="input-error"></div>
     </div>
@@ -282,9 +283,9 @@
     <div>
       <div class="section-title">Animation Speed</div>
       <div class="slider-row">
-        <span style="font-size:0.78rem;color:var(--muted)">0.25&times;</span>
+        <span style="font-size:0.75rem;color:var(--muted)">0.25&times;</span>
         <input type="range" id="speed-slider" min="1" max="16" value="4" oninput="updateSpeed()" />
-        <span style="font-size:0.78rem;color:var(--muted)">4&times;</span>
+        <span style="font-size:0.75rem;color:var(--muted)">4&times;</span>
         <span class="speed-label" id="speed-display">1&times;</span>
       </div>
     </div>
@@ -298,7 +299,7 @@
         <button class="ctrl" id="btn-pause" onclick="pause()" disabled>Pause</button>
         <button class="ctrl" onclick="reset()">Reset</button>
       </div>
-      <div class="status-row" style="margin-top:8px">
+      <div class="status-row">
         <span>Status: <span id="status-label">Idle</span></span>
         <span id="step-counter">Step 0 / 0</span>
       </div>
@@ -319,8 +320,10 @@
       <div class="legend">
         <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Normal</div>
         <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Active</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div>Prefix Focus</div>
         <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Placed</div>
         <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Sorted ✓</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>Output Ptr</div>
       </div>
     </div>
 
@@ -333,7 +336,7 @@
     </div>
 
     <div class="cx-wrap">
-      <div class="cx-header"><span style="font-size:0.85rem">⏱</span><span class="cx-title">Complexity Analysis</span></div>
+      <div class="cx-header"><span style="font-size:0.82rem">⏱</span><span class="cx-title">Complexity Analysis</span></div>
       <div class="cx-body">
         <div id="cx-table"></div>
         <div class="cx-sep"></div>
@@ -345,9 +348,12 @@
         </div>
       </div>
     </div>
+
   </aside>
 
+  <!-- ── RIGHT: VIZ PANEL ── -->
   <div class="viz-panel">
+
     <div class="viz-legend-bar">
       <div class="vlb-item"><div class="vlb-dot" style="background:#6366f1"></div>Normal</div>
       <div class="vlb-item"><div class="vlb-dot" style="background:#f59e0b"></div>Active / Compare</div>
@@ -372,7 +378,7 @@
       Press <span>Build Steps</span> then <span>Play</span> or <span>Step &#9654;</span> to begin.
     </div>
 
-    <div class="bottom-strip">
+    <div class="history-strip">
       <div id="history-panel">
         <table id="history-table">
           <thead><tr><th>#</th><th>Phase</th><th>Value</th><th>Index</th></tr></thead>
@@ -381,387 +387,8 @@
       </div>
     </div>
 
-  <div class="edu-sections">
-
-  <!-- EDUCATIONAL CONTENT -->
-  <section class="edu-section">
-    <div class="edu-sec-header edu-hdr">📚 Educational Content — Worked Examples, Key Concepts &amp; Common Mistakes</div>
-    <div class="edu-sec-body">
-      <div class="edu-three-col">
-
-        <!-- Counting Sort Worked Example -->
-        <div class="edu-card ai">
-          <div class="edu-card-title">✏️ Worked Example: Counting Sort on [3, 1, 4, 1, 5]</div>
-          <div class="edu-step"><div class="edu-step-num">1</div><div class="edu-step-text"><strong>Build count array</strong> (k=5):<br>Scan input → <code>C = [0,2,0,1,1,1]</code><br>C[1]=2 because 1 appears twice.</div></div>
-          <div class="edu-step"><div class="edu-step-num">2</div><div class="edu-step-text"><strong>Prefix sums</strong> (cumulative):<br><code>C = [0,2,2,3,4,5]</code><br>C[i] now = # elements ≤ i.</div></div>
-          <div class="edu-step"><div class="edu-step-num">3</div><div class="edu-step-text"><strong>Place right-to-left</strong> (for stability):<br>A[4]=5 → B[4], A[3]=1 → B[1]<br>A[2]=4 → B[3], A[1]=1 → B[0]<br>A[0]=3 → B[2]</div></div>
-          <div class="edu-step"><div class="edu-step-num">4</div><div class="edu-step-text"><strong>Result:</strong> <code>B = [1, 1, 3, 4, 5]</code> ✓<br>Total ops: O(n+k) = O(5+5) = O(10)</div></div>
-        </div>
-
-        <!-- Radix Sort Worked Example (NEW) -->
-        <div class="edu-card" style="border-left:3px solid #34d399">
-          <div class="edu-card-title">✏️ Worked Example: Radix Sort on [170, 45, 75, 90, 2]</div>
-          <div class="edu-step"><div class="edu-step-num">1</div><div class="edu-step-text"><strong>Pass 1 — Ones digit:</strong><br>digits: 0,5,5,0,2 → stable sort by ones<br><code>[170, 90, 2, 45, 75]</code><br>170&amp;90 have ones=0 and keep order ✓</div></div>
-          <div class="edu-step"><div class="edu-step-num">2</div><div class="edu-step-text"><strong>Pass 2 — Tens digit:</strong><br>digits: 7,9,0,4,7 → stable sort by tens<br><code>[2, 45, 170, 75, 90]</code><br>170&amp;75 both have tens=7; 170 stays before 75 ✓</div></div>
-          <div class="edu-step"><div class="edu-step-num">3</div><div class="edu-step-text"><strong>Pass 3 — Hundreds digit:</strong><br>digits: 0,0,1,0,0 → stable sort by hundreds<br><code>[2, 45, 75, 90, 170]</code> ✓<br>Only 170 has hundreds=1, rest have 0.</div></div>
-          <div class="edu-step"><div class="edu-step-num">4</div><div class="edu-step-text"><strong>Key insight:</strong> Each pass is a full <strong>stable Counting Sort</strong> on one digit. Stability ensures prior passes are preserved. d=3 passes × O(n+10) = <code>O(d(n+b))</code>.</div></div>
-        </div>
-
-        <!-- Common Mistakes -->
-        <div class="edu-card ar">
-          <div class="edu-card-title">⚠️ Common Mistakes</div>
-          <div class="mistake-item"><div class="mi-x">✗</div><div class="mi-text"><strong>Iterating left-to-right when placing:</strong> This breaks stability. Always iterate right-to-left in the output phase.</div></div>
-          <div class="mistake-item"><div class="mi-x">✗</div><div class="mi-text"><strong>Assuming O(n+k) is always faster:</strong> If k=9999 and n=2 (try the worst-case preset!), Counting Sort is far slower than Quicksort.</div></div>
-          <div class="mistake-item"><div class="mi-x">✗</div><div class="mi-text"><strong>Using an unstable sort inside Radix Sort:</strong> The sub-sort must be stable or previous digit passes are destroyed.</div></div>
-          <div class="mistake-item"><div class="mi-x">✗</div><div class="mi-text"><strong>Sorting MSD first in Radix Sort:</strong> You must sort LSD (least significant) first, then towards MSD.</div></div>
-          <div class="mistake-item"><div class="mi-x">✗</div><div class="mi-text"><strong>Forgetting C has size k+1:</strong> Values range 0 to k, so the count array needs k+1 slots, not k.</div></div>
-        </div>
-
-      </div>
-
-      <!-- Key Concepts full-width -->
-      <div class="edu-card al">
-        <div class="edu-card-title">⭐ Key Concepts</div>
-        <div class="edu-two-col" style="margin-top:4px">
-          <div>
-            <div class="key-concept"><div class="kc-label">Stability Matters</div><div class="kc-text">Right-to-left placement ensures equal elements keep their original relative order. This is critical for Radix Sort correctness — each digit pass must preserve previous passes.</div></div>
-            <div class="key-concept"><div class="kc-label">Integers Only</div><div class="kc-text">Counting Sort works by using values as array indices. It cannot handle floating-point numbers or strings. The range k must be known in advance.</div></div>
-          </div>
-          <div>
-            <div class="key-concept"><div class="kc-label">When k ≫ n, O(k) Dominates</div><div class="kc-text">Sorting [1, 9999] costs O(n+k) = O(10001) — far worse than O(n log n) = O(2). Always check if k is proportional to n before using Counting Sort.</div></div>
-            <div class="key-concept"><div class="kc-label">Radix Sort = Repeated Counting Sort</div><div class="kc-text">Each digit pass is a full stable Counting Sort on that digit position. Sorting LSD → MSD ensures the final pass produces a globally sorted array.</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CLO-1 -->
-  <section class="edu-section">
-    <div class="edu-sec-header clo1">📊 CLO-1 — Complexity Analysis &amp; Growth Curves <span class="section-badge sb-clo1">10 marks</span></div>
-    <div class="edu-sec-body">
-
-      <div class="edu-two-col">
-        <div class="chart-wrap">
-          <div class="edu-card-title" style="margin-bottom:10px">Interactive Growth Curves — Actual vs Theoretical</div>
-          <div class="chart-controls">
-            <label>Max n: <strong id="gc-n-label">200</strong></label>
-            <input type="range" id="gc-n-slider" min="10" max="500" value="200" oninput="drawGrowthChart()" style="flex:1;accent-color:#6366f1;min-width:100px" />
-            <label>k (range): <strong id="gc-k-label">n</strong></label>
-            <input type="range" id="gc-k-slider" min="1" max="5" value="1" oninput="drawGrowthChart()" style="flex:1;accent-color:#f59e0b;min-width:80px" />
-          </div>
-          <canvas id="growth-chart"></canvas>
-          <div class="chart-legend">
-            <div class="cl-item"><div class="cl-line" style="background:#6366f1"></div>O(n+k) Counting Sort</div>
-            <div class="cl-item"><div class="cl-line" style="background:#10b981"></div>O(d·(n+10)) Radix Sort</div>
-            <div class="cl-item"><div class="cl-line" style="background:#f59e0b"></div>O(n log n) Comparison Sort</div>
-            <div class="cl-item"><div class="cl-line" style="background:#ef4444;border-top:2px dashed #ef4444;height:0"></div>Ω(n log n) lower bound</div>
-          </div>
-          <div class="edu-card-text" style="margin-top:10px;font-size:0.74rem">
-            Drag <strong>Max n</strong> to change input size. Drag <strong>k (range)</strong> to scale k (×1 to ×5 of n).
-            The <span style="color:#ef4444">dashed red line</span> is the Ω(n log n) theoretical lower bound (≈ 0.5·n·log n) — always below the actual O(n log n) curve above it.
-            Watch Counting Sort cross above O(n log n) when k grows large.
-          </div>
-        </div>
-
-        <div class="dt-wrap">
-          <div class="dt-title">🌳 Decision Tree — Why Comparison Sorts Need Ω(n log n)</div>
-          <svg viewBox="0 0 440 260" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block">
-            <line x1="220" y1="32" x2="120" y2="82" stroke="#2e3347" stroke-width="1.5"/>
-            <line x1="220" y1="32" x2="320" y2="82" stroke="#2e3347" stroke-width="1.5"/>
-            <line x1="120" y1="96" x2="70"  y2="146" stroke="#2e3347" stroke-width="1.5"/>
-            <line x1="120" y1="96" x2="170" y2="146" stroke="#2e3347" stroke-width="1.5"/>
-            <line x1="320" y1="96" x2="270" y2="146" stroke="#2e3347" stroke-width="1.5"/>
-            <line x1="320" y1="96" x2="370" y2="146" stroke="#2e3347" stroke-width="1.5"/>
-            <line x1="70"  y1="160" x2="42" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <line x1="70"  y1="160" x2="98" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <line x1="170" y1="160" x2="142" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <line x1="170" y1="160" x2="198" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <line x1="270" y1="160" x2="242" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <line x1="270" y1="160" x2="298" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <line x1="370" y1="160" x2="342" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <line x1="370" y1="160" x2="398" y2="210" stroke="#2e3347" stroke-width="1.2"/>
-            <rect x="172" y="18" width="96" height="28" rx="5" fill="#1e2235" stroke="#6366f1" stroke-width="1.5"/>
-            <text x="220" y="36" text-anchor="middle" fill="#818cf8" font-size="11" font-family="monospace">A[i] ≤ A[j]?</text>
-            <rect x="78" y="82" width="84" height="24" rx="4" fill="#1e2235" stroke="#2e3347" stroke-width="1"/>
-            <text x="120" y="98" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">compare…</text>
-            <rect x="278" y="82" width="84" height="24" rx="4" fill="#1e2235" stroke="#2e3347" stroke-width="1"/>
-            <text x="320" y="98" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">compare…</text>
-            <text x="158" y="74" fill="#22c55e" font-size="9" font-family="sans-serif">yes</text>
-            <text x="274" y="74" fill="#ef4444" font-size="9" font-family="sans-serif">no</text>
-            <rect x="30"  y="146" width="80" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="70"  y="160" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">…</text>
-            <rect x="130" y="146" width="80" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="170" y="160" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">…</text>
-            <rect x="230" y="146" width="80" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="270" y="160" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">…</text>
-            <rect x="330" y="146" width="80" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="370" y="160" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">…</text>
-            <rect x="20"  y="205" width="44" height="22" rx="3" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.3)"/><text x="42"  y="219" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">[1,2,3]</text>
-            <rect x="74"  y="205" width="44" height="22" rx="3" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.3)"/><text x="96"  y="219" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">[1,3,2]</text>
-            <rect x="120" y="205" width="44" height="22" rx="3" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.3)"/><text x="142" y="219" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">[2,1,3]</text>
-            <rect x="176" y="205" width="44" height="22" rx="3" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.3)"/><text x="198" y="219" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">[2,3,1]</text>
-            <rect x="222" y="205" width="44" height="22" rx="3" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.3)"/><text x="244" y="219" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">[3,1,2]</text>
-            <rect x="276" y="205" width="44" height="22" rx="3" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.3)"/><text x="298" y="219" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">[3,2,1]</text>
-            <rect x="322" y="205" width="44" height="22" rx="3" fill="rgba(99,102,241,0.12)" stroke="rgba(99,102,241,0.3)"/><text x="344" y="219" text-anchor="middle" fill="#818cf8" font-size="8" font-family="monospace">…</text>
-            <rect x="378" y="205" width="44" height="22" rx="3" fill="rgba(99,102,241,0.12)" stroke="rgba(99,102,241,0.3)"/><text x="400" y="219" text-anchor="middle" fill="#818cf8" font-size="8" font-family="monospace">…</text>
-            <text x="6" y="26" fill="#f59e0b" font-size="9" font-family="sans-serif">depth = h</text>
-            <text x="6" y="228" fill="#64748b" font-size="9" font-family="sans-serif">n! leaves</text>
-            <text x="148" y="250" fill="#ef4444" font-size="9.5" font-family="sans-serif" text-anchor="middle">2ʰ ≥ n! → h ≥ log₂(n!) ≈ n·log₂n → Ω(n log n)</text>
-          </svg>
-          <div class="dt-note">Every comparison-based sort corresponds to a decision tree with n! leaves. A tree of depth h has at most 2ʰ leaves, so <strong style="color:#f59e0b">h ≥ log₂(n!) ≈ n·log n</strong>, proving the <strong style="color:#ef4444">Ω(n log n) lower bound</strong>. Counting &amp; Radix Sort bypass this by <em>never comparing elements</em>.</div>
-        </div>
-      </div>
-
-      <div class="edu-card aa">
-        <div class="edu-card-title">🔴 Worst Case Analysis — When and Why Performance Degrades</div>
-        <div class="edu-two-col">
-          <div>
-            <div class="kc-label" style="color:#f59e0b">Counting Sort Worst Case</div>
-            <div class="kc-text" style="margin-bottom:10px">When <strong>k ≫ n</strong>, the O(k) initialization and prefix-sum passes dominate. Example: sorting <strong>[1, 9999]</strong> requires a count array of 10,000 cells for just 2 elements — O(k)=O(10000) vs O(n log n)=O(2). The "all equal values" case is actually NOT the worst case — k equals that one value, but placement is trivially fast. The true worst case is a tiny array with one very large value.</div>
-            <div class="edu-step"><div class="edu-step-num" style="background:#f59e0b">!</div><div class="edu-step-text">Try the <strong>Worst case preset</strong> [1, 9999] — notice the huge count array needed for just 2 elements.</div></div>
-          </div>
-          <div>
-            <div class="kc-label" style="color:#f59e0b">Radix Sort Worst Case</div>
-            <div class="kc-text" style="margin-bottom:10px">When <strong>d is large</strong> (many digits per number), Radix Sort makes d full passes each costing O(n+b). For numbers up to 10⁹ (d=10 in decimal), this is still very competitive. The practical worst case is large d with small n — each pass has constant overhead.</div>
-            <div class="edu-step"><div class="edu-step-num" style="background:#f59e0b">!</div><div class="edu-step-text">Try Radix Sort on: <code>100000000, 200000000</code> — watch it take 9 digit passes.</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="edu-card ai">
-        <div class="edu-card-title">📋 Complexity Comparison: Counting Sort vs Radix Sort vs Comparison Sorts</div>
-        <div class="ce-table-wrap"><table class="ce-table">
-          <thead><tr><th>Algorithm</th><th>Best Case</th><th>Average Case</th><th>Worst Case</th><th>Space</th><th>Stable?</th><th>Comparison-based?</th></tr></thead>
-          <tbody>
-            <tr><td style="color:#818cf8;font-weight:700">Counting Sort</td><td class="good">O(n+k)</td><td class="good">O(n+k)</td><td>O(n+k) — degrades if k≫n</td><td>O(n+k)</td><td class="good">✓ Yes</td><td class="good">✗ No</td></tr>
-            <tr><td style="color:#34d399;font-weight:700">Radix Sort</td><td class="good">O(d(n+b))</td><td class="good">O(d(n+b))</td><td class="good">O(d(n+b))</td><td>O(n+b)</td><td class="good">✓ Yes</td><td class="good">✗ No</td></tr>
-            <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td class="good">✓ Yes</td><td class="bad">✓ Yes</td></tr>
-            <tr><td>Quicksort</td><td>O(n log n)</td><td>O(n log n)</td><td class="bad">O(n²)</td><td>O(log n)</td><td class="bad">✗ No</td><td class="bad">✓ Yes</td></tr>
-            <tr><td>Heap Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td class="bad">✗ No</td><td class="bad">✓ Yes</td></tr>
-          </tbody>
-        </table></div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- CLO-2 -->
-  <section class="edu-section">
-    <div class="edu-sec-header clo2">⚖️ CLO-2 — Sorting Role &amp; Impact Analysis <span class="section-badge sb-clo2">10 marks</span></div>
-    <div class="edu-sec-body">
-
-      <div class="edu-card al">
-        <div class="edu-card-title">🏁 Side-by-Side: Counting Sort vs Quicksort — Same Input, Same Machine</div>
-        <div class="run-input-row" style="margin-bottom:14px">
-          <input type="text" id="run-input" value="64, 25, 12, 22, 11, 90, 37, 5, 19, 77" placeholder="Enter numbers to compare..." />
-          <button class="run-btn" onclick="runComparison()">▶ Run Comparison</button>
-        </div>
-        <div class="run-results" id="run-results" style="display:none">
-          <div class="run-box">
-            <div class="run-box-title cs">Counting Sort</div>
-            <div class="run-stat">Array Reads <span id="cs-reads">—</span></div>
-            <div class="run-stat">Array Writes <span id="cs-writes">—</span></div>
-            <div class="run-stat">Total Ops <span id="cs-total">—</span></div>
-            <div class="run-stat">Time Class <span style="color:#818cf8">O(n+k)</span></div>
-            <div class="run-bar-row"><div style="font-size:0.68rem;color:var(--muted);margin-bottom:3px">Relative ops:</div><div class="run-bar-bg"><div class="run-bar-fill" id="cs-bar" style="background:#6366f1;width:0%"></div></div></div>
-          </div>
-          <div class="run-box">
-            <div class="run-box-title qs">Quicksort</div>
-            <div class="run-stat">Comparisons <span id="qs-comps">—</span></div>
-            <div class="run-stat">Swaps <span id="qs-swaps">—</span></div>
-            <div class="run-stat">Total Ops <span id="qs-total">—</span></div>
-            <div class="run-stat">Time Class <span style="color:#f59e0b">O(n log n)</span></div>
-            <div class="run-bar-row"><div style="font-size:0.68rem;color:var(--muted);margin-bottom:3px">Relative ops:</div><div class="run-bar-bg"><div class="run-bar-fill" id="qs-bar" style="background:#f59e0b;width:0%"></div></div></div>
-          </div>
-        </div>
-        <div id="run-verdict" style="display:none;margin-top:12px;padding:10px 14px;border-radius:6px;font-size:0.8rem;font-weight:600"></div>
-        <div class="edu-card-text" style="margin-top:10px;font-size:0.74rem">Counting Sort ops include count array init (k+1 writes), counting pass (n reads+writes), prefix pass (k reads+writes), placement (n reads+writes). Quicksort counts comparisons and swaps.</div>
-      </div>
-
-      <div class="edu-two-col">
-        <div class="edu-card ai">
-          <div class="edu-card-title">🔍 Role of Sorting Within Each Algorithm</div>
-          <div class="kc-label" style="color:#818cf8">Counting Sort</div>
-          <div class="kc-text" style="margin-bottom:10px">Counting Sort <em>is</em> the sorting algorithm. Values are used as array indices — this implicitly sorts because indices are ordered. Prefix sums convert counts to final positions. No element is ever compared to another. <strong style="color:#f59e0b">Watch for the orange "Active" bar</strong> in the visualizer — it shows the element being placed into its sorted position.</div>
-          <div class="kc-label" style="color:#34d399">Radix Sort — Counting Sort as Sub-Sort</div>
-          <div class="kc-text">Radix Sort uses Counting Sort as a stable sub-sort on each digit position. <strong style="color:#10b981">Each pass banner in the visualizer ("PASS N — Counting Sort on [digit] digit")</strong> shows exactly when a full Counting Sort run begins. Without a stable sub-sort, previous digit passes are destroyed.</div>
-        </div>
-        <div class="edu-card aa">
-          <div class="edu-card-title">📈 Scaling Behaviour — When Each Algorithm Wins</div>
-          <div class="kc-label" style="color:#22c55e">Counting Sort Wins When</div>
-          <div class="kc-text" style="margin-bottom:10px">• k = O(n) — value range proportional to input size<br>• Data is non-negative integers in a known bounded range<br>• Stability is required and memory is available<br><em>Example: sorting exam scores 0–100 for 10,000 students → k=100, clearly O(n).</em></div>
-          <div class="kc-label" style="color:#f59e0b">Quicksort / Merge Sort Win When</div>
-          <div class="kc-text">• Data is not integers (strings, floats, objects)<br>• k ≫ n (sparse values over a wide range) — try preset [1, 9999]<br>• Memory is tight (Quicksort is O(log n) space in-place)<br><em>Example: sorting 100 UUID strings — can't use Counting Sort at all.</em></div>
-        </div>
-      </div>
-
-      <div class="edu-card ar">
-        <div class="edu-card-title">💥 Impact Analysis — What Breaks When You Remove Stability</div>
-        <div class="edu-card-text" style="margin-bottom:14px">Radix Sort sorts digit-by-digit LSD→MSD. Each pass must be <strong>stable</strong>. If unstable, equal-digit elements scramble, destroying previous passes. Example with [321, 212, 123, 132]:</div>
-        <div class="impact-wrap">
-          <div class="impact-box">
-            <div class="impact-box-title ok">✓ Stable Sub-Sort (Correct)</div>
-            <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">Start: [321, 212, 123, 132]</div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:4px">After ones pass (stable):</div>
-            <div class="impact-arr"><div class="ic n">321</div><div class="ic n">212</div><div class="ic n">132</div><div class="ic n">123</div></div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:4px;margin-top:6px">After tens pass (stable):</div>
-            <div class="impact-arr"><div class="ic n">212</div><div class="ic n">321</div><div class="ic n">123</div><div class="ic n">132</div></div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:4px;margin-top:6px">After hundreds pass → Final:</div>
-            <div class="impact-arr"><div class="ic ok">123</div><div class="ic ok">132</div><div class="ic ok">212</div><div class="ic ok">321</div></div>
-            <div class="impact-note" style="margin-top:8px">✓ Each pass preserves prior pass ordering because equal-digit elements keep their relative position.</div>
-          </div>
-          <div class="impact-box">
-            <div class="impact-box-title bad">✗ Unstable Sub-Sort (Broken)</div>
-            <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px">Start: [321, 212, 123, 132]</div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:4px">After ones pass (unstable — scrambled):</div>
-            <div class="impact-arr"><div class="ic bad">212</div><div class="ic bad">321</div><div class="ic bad">132</div><div class="ic bad">123</div></div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:4px;margin-top:6px">After tens pass (previous ordering lost):</div>
-            <div class="impact-arr"><div class="ic bad">321</div><div class="ic bad">212</div><div class="ic bad">123</div><div class="ic bad">132</div></div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:4px;margin-top:6px">After hundreds pass → Final (WRONG):</div>
-            <div class="impact-arr"><div class="ic bad">123</div><div class="ic bad">212</div><div class="ic bad">321</div><div class="ic bad">132</div></div>
-            <div class="impact-note" style="margin-top:8px">✗ 132 ends up out of order — unstable sorting scrambles equal-digit elements, corrupting prior passes.</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- CLO-3 -->
-  <section class="edu-section">
-    <div class="edu-sec-header clo3">🧩 CLO-3 — Design Paradigm: Not D&amp;C, Not DP, Not Greedy <span class="section-badge sb-clo3">10 marks</span></div>
-    <div class="edu-sec-body">
-
-      <div>
-        <div class="edu-card-title" style="margin-bottom:12px">Which Paradigm Does This Use?</div>
-        <div class="paradigm-grid">
-          <div class="pg-card dim">
-            <div class="pg-badge no">✗ Not Used</div>
-            <div class="pg-name">Divide &amp; Conquer</div>
-            <div class="pg-text">D&C splits the problem recursively and combines. Examples: Merge Sort, Quicksort.<br><br>Counting Sort does <em>not</em> split the array. There is no recursion, no sub-problem structure, no combine step.</div>
-          </div>
-          <div class="pg-card dim">
-            <div class="pg-badge no">✗ Not Used</div>
-            <div class="pg-name">Dynamic Programming</div>
-            <div class="pg-text">DP stores results of overlapping sub-problems. The count array is sometimes confused for a DP table, but it is not — there are no overlapping sub-problems being memoized, no recurrence relation.<br><br>Examples of DP: LCS, Matrix Chain Multiplication.</div>
-          </div>
-          <div class="pg-card dim">
-            <div class="pg-badge no">✗ Not Used</div>
-            <div class="pg-name">Greedy</div>
-            <div class="pg-text">Greedy makes locally optimal choices. Counting Sort makes no "choices" — placement positions are arithmetically computed from prefix sums. There is no decision being made.<br><br>Examples of Greedy: Dijkstra's, Huffman coding.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="edu-card al" style="border-left:3px solid #818cf8">
-        <div class="edu-card-title" style="color:#818cf8">✅ What Paradigm They Actually Use: Integer Structure Exploitation</div>
-        <div class="edu-two-col">
-          <div>
-            <div class="kc-label">The Core Insight</div>
-            <div class="kc-text" style="margin-bottom:10px">Counting and Radix Sort belong to <strong>non-comparison-based integer sorting</strong>. They do not fit D&C, DP, or Greedy because their design principle is different: they exploit the <em>algebraic properties of integers</em> to place elements directly without comparisons.</div>
-            <div class="kc-label">How They Exploit Integer Structure</div>
-            <div class="kc-text">• <strong>Integers as array indices</strong> — if A[i]=7, directly access C[7]. Floats/strings cannot do this.<br>• <strong>Digit extraction</strong> — <code>getDigit(n, pos)</code> in O(1), enabling Radix Sort's digit passes.<br>• <strong>Bounded enumerable range</strong> — preallocate exactly C[0..k] knowing all possible values.</div>
-          </div>
-          <div>
-            <div class="kc-label">Why This Beats Ω(n log n)</div>
-            <div class="kc-text" style="margin-bottom:10px">The Ω(n log n) lower bound applies only to algorithms that determine order <em>exclusively through comparisons</em>. By using integer values as indices, Counting Sort <em>never compares A[i] to A[j]</em> — it reads A[i] and uses its value to address C[A[i]], completely sidestepping the decision-tree argument.</div>
-            <div class="kc-label">The Algorithm Pattern</div>
-            <div class="kc-text">The pattern is: <strong>Count → Accumulate → Place</strong>. This three-phase structure is unique to integer sorting. No recursion tree, no DP table, no greedy choice — just direct positional arithmetic from integer properties.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="edu-two-col">
-        <div class="edu-card ai">
-          <div class="edu-card-title">🌲 D&amp;C Comparison: Merge Sort Recursion Tree (for [4,2,2,8])</div>
-          <svg viewBox="0 0 380 200" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-bottom:8px">
-            <line x1="190" y1="30" x2="100" y2="70" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,3"/>
-            <line x1="190" y1="30" x2="280" y2="70" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,3"/>
-            <line x1="100" y1="84" x2="55"  y2="120" stroke="#f97316" stroke-width="1.2" stroke-dasharray="4,3"/>
-            <line x1="100" y1="84" x2="145" y2="120" stroke="#f97316" stroke-width="1.2" stroke-dasharray="4,3"/>
-            <line x1="280" y1="84" x2="235" y2="120" stroke="#f97316" stroke-width="1.2" stroke-dasharray="4,3"/>
-            <line x1="280" y1="84" x2="325" y2="120" stroke="#f97316" stroke-width="1.2" stroke-dasharray="4,3"/>
-            <line x1="55"  y1="134" x2="100" y2="158" stroke="#22c55e" stroke-width="1.2"/>
-            <line x1="145" y1="134" x2="100" y2="158" stroke="#22c55e" stroke-width="1.2"/>
-            <line x1="235" y1="134" x2="280" y2="158" stroke="#22c55e" stroke-width="1.2"/>
-            <line x1="325" y1="134" x2="280" y2="158" stroke="#22c55e" stroke-width="1.2"/>
-            <line x1="100" y1="172" x2="190" y2="188" stroke="#22c55e" stroke-width="1.5"/>
-            <line x1="280" y1="172" x2="190" y2="188" stroke="#22c55e" stroke-width="1.5"/>
-            <rect x="148" y="16" width="84" height="24" rx="4" fill="#1e2235" stroke="#f97316" stroke-width="1.5"/>
-            <text x="190" y="32" text-anchor="middle" fill="#fb923c" font-size="10.5" font-family="monospace">[4, 2, 2, 8]</text>
-            <text x="50" y="58" fill="#f97316" font-size="8.5" font-family="sans-serif">DIVIDE</text>
-            <rect x="60"  y="70" width="80" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="100" y="84" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">[4, 2]</text>
-            <rect x="240" y="70" width="80" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="280" y="84" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">[2, 8]</text>
-            <rect x="30"  y="120" width="50" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="55"  y="134" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">[4]</text>
-            <rect x="120" y="120" width="50" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="145" y="134" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">[2]</text>
-            <rect x="210" y="120" width="50" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="235" y="134" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">[2]</text>
-            <rect x="300" y="120" width="50" height="22" rx="3" fill="#1e2235" stroke="#2e3347"/><text x="325" y="134" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace">[8]</text>
-            <text x="50" y="152" fill="#22c55e" font-size="8.5" font-family="sans-serif">MERGE</text>
-            <rect x="60"  y="157" width="80" height="22" rx="3" fill="#1e2235" stroke="#22c55e" stroke-opacity="0.4"/><text x="100" y="171" text-anchor="middle" fill="#22c55e" font-size="10" font-family="monospace">[2, 4]</text>
-            <rect x="240" y="157" width="80" height="22" rx="3" fill="#1e2235" stroke="#22c55e" stroke-opacity="0.4"/><text x="280" y="171" text-anchor="middle" fill="#22c55e" font-size="10" font-family="monospace">[2, 8]</text>
-            <rect x="148" y="185" width="84" height="14" rx="3" fill="rgba(34,197,94,0.1)" stroke="rgba(34,197,94,0.3)"/><text x="190" y="195" text-anchor="middle" fill="#22c55e" font-size="9.5" font-family="monospace">[2, 2, 4, 8] ✓</text>
-          </svg>
-          <div class="dt-note">Merge Sort <strong>divides</strong> [4,2,2,8] recursively (orange dashed), then <strong>merges</strong> sorted sub-arrays (green). Classic D&C: split → conquer → combine. O(log n) recursion levels. <em>Counting Sort has no such tree — it never splits the array.</em></div>
-        </div>
-
-        <div class="edu-card al">
-          <div class="edu-card-title">➡️ Counting Sort Flow (for [4, 2, 2, 8]) — Linear, No Recursion</div>
-          <svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-bottom:8px">
-            <rect x="10" y="10" width="340" height="34" rx="5" fill="rgba(99,102,241,0.08)" stroke="#6366f1" stroke-width="1"/>
-            <text x="20" y="24" fill="#818cf8" font-size="9" font-family="sans-serif" font-weight="700">PHASE 1: COUNT</text>
-            <text x="20" y="37" fill="#94a3b8" font-size="9" font-family="monospace">Input A=[4,2,2,8]  →  C[0..8]=[0,0,2,0,1,0,0,0,1]</text>
-            <line x1="180" y1="44" x2="180" y2="62" stroke="#6366f1" stroke-width="2" marker-end="url(#a1)"/>
-            <defs>
-              <marker id="a1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 Z" fill="#6366f1"/></marker>
-              <marker id="a2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 Z" fill="#f59e0b"/></marker>
-              <marker id="a3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 Z" fill="#22c55e"/></marker>
-            </defs>
-            <rect x="10" y="62" width="340" height="34" rx="5" fill="rgba(245,158,11,0.07)" stroke="#f59e0b" stroke-width="1"/>
-            <text x="20" y="76" fill="#f59e0b" font-size="9" font-family="sans-serif" font-weight="700">PHASE 2: PREFIX SUMS</text>
-            <text x="20" y="89" fill="#94a3b8" font-size="9" font-family="monospace">C=[0,0,2,2,3,3,3,3,4]   C[i] = # elements ≤ i</text>
-            <line x1="180" y1="96" x2="180" y2="114" stroke="#f59e0b" stroke-width="2" marker-end="url(#a2)"/>
-            <rect x="10" y="114" width="340" height="34" rx="5" fill="rgba(34,197,94,0.07)" stroke="#22c55e" stroke-width="1"/>
-            <text x="20" y="128" fill="#22c55e" font-size="9" font-family="sans-serif" font-weight="700">PHASE 3: PLACE (right-to-left)</text>
-            <text x="20" y="141" fill="#94a3b8" font-size="9" font-family="monospace">A[3]=8→B[3], A[2]=2→B[1], A[1]=2→B[0], A[0]=4→B[2]</text>
-            <line x1="180" y1="148" x2="180" y2="166" stroke="#22c55e" stroke-width="2" marker-end="url(#a3)"/>
-            <rect x="60" y="166" width="240" height="28" rx="5" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.35)" stroke-width="1.5"/>
-            <text x="180" y="184" text-anchor="middle" fill="#22c55e" font-size="11" font-family="monospace" font-weight="700">B = [2, 2, 4, 8] ✓</text>
-            <text x="355" y="100" fill="#ef4444" font-size="8" font-family="sans-serif" text-anchor="end">No splits.</text>
-            <text x="355" y="110" fill="#ef4444" font-size="8" font-family="sans-serif" text-anchor="end">No recursion.</text>
-            <text x="355" y="120" fill="#ef4444" font-size="8" font-family="sans-serif" text-anchor="end">No merging.</text>
-          </svg>
-          <div class="dt-note">Counting Sort flows in <strong>three sequential linear passes</strong>. The array is never split, there is no recursion tree, no sub-problem. This is fundamentally not D&C — just direct positional computation exploiting integer indexing.</div>
-        </div>
-      </div>
-
-      <div class="edu-card ar">
-        <div class="edu-card-title">❌ Counterexample — Why Other Paradigms Give Worse or Wrong Results Here</div>
-        <div class="edu-two-col">
-          <div>
-            <div class="kc-label" style="color:#ef4444">If You Tried D&C (like Merge Sort) on Integer Data</div>
-            <div class="kc-text" style="margin-bottom:10px">Merge Sort works correctly on integers but pays O(n log n) comparisons when Counting Sort sorts in O(n+k) with none. For n=10,000 elements in range 0–1000: Merge Sort needs ~130,000 comparisons, Counting Sort needs only ~11,000 ops.</div>
-            <div class="ce-table-wrap"><table class="ce-table">
-              <thead><tr><th>n</th><th>k</th><th>Merge Sort</th><th>Counting Sort</th><th>Winner</th></tr></thead>
-              <tbody>
-                <tr><td>1,000</td><td>100</td><td>~10,000</td><td class="good">~1,100</td><td class="good">Counting ✓</td></tr>
-                <tr><td>10,000</td><td>1,000</td><td>~130,000</td><td class="good">~11,000</td><td class="good">Counting ✓</td></tr>
-                <tr><td>1,000</td><td>1,000,000</td><td>~10,000</td><td class="bad">~1,001,000</td><td class="bad">Merge ✓</td></tr>
-              </tbody>
-            </table></div>
-          </div>
-          <div>
-            <div class="kc-label" style="color:#ef4444">Greedy (Selection Sort) = O(n²)</div>
-            <div class="kc-text" style="margin-bottom:10px">A greedy approach — repeatedly pick the minimum — is Selection Sort, O(n²). It ignores integer structure completely and is far worse than O(n+k).</div>
-            <div class="kc-label" style="color:#ef4444">DP approach = O(n log n) at best</div>
-            <div class="kc-text">Applying DP to sorting (like LIS) gives O(n log n) at best. It treats elements as opaque objects, while Counting Sort treats values as addresses.</div>
-            <div class="edu-step" style="margin-top:10px"><div class="edu-step-num" style="background:#ef4444">!</div><div class="edu-step-text"><strong>Key takeaway:</strong> None of the three classic paradigms can achieve O(n+k). Only by exploiting integer-specific properties can we break the Ω(n log n) barrier.</div></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  </div><!-- end edu-sections -->
-  </div><!-- end viz-panel -->
-</div><!-- end layout -->
+  </div>
+</div>
 
 <script>
 // ── STATE ──
@@ -773,15 +400,8 @@ let playTimer = null;
 let speedMultiplier = 1;
 let historyRows = [];
 
-// ── VIZ CACHE (persistent bar elements for smooth animation) ──
-const vizCache = {
-  bars: [],
-  countCells: [],
-  n: 0,
-  countLen: 0,
-  banner: null,
-  headerLabel: null
-};
+// ── VIZ CACHE ──
+const vizCache = { bars: [], countCells: [], n: 0, countLen: 0, banner: null, headerLabel: null };
 
 // ── PSEUDOCODE ──
 const PSEUDO = {
@@ -832,9 +452,7 @@ function validateInput() {
 }
 function showErr(msg) {
   const errEl = document.getElementById('input-error');
-  errEl.textContent = msg;
-  errEl.classList.add('visible');
-  return false;
+  errEl.textContent = msg; errEl.classList.add('visible'); return false;
 }
 function getInput() {
   return document.getElementById('custom-input').value
@@ -843,11 +461,8 @@ function getInput() {
 
 // ── STEP GENERATORS ──
 function generateCountingSteps(arr) {
-  const result = [];
-  const A = [...arr];
-  const n = A.length;
-  const k = Math.max(...A);
-  const C = new Array(k + 1).fill(0);
+  const result = []; const A = [...arr]; const n = A.length;
+  const k = Math.max(...A); const C = new Array(k + 1).fill(0);
   result.push({ phase:'init', arr:[...A], C:[...C], msg:'Initialize count array C[0..' + k + '] with all zeros. k=<b style="color:#f59e0b">' + k + '</b> (max value in input).', pseudoLine:1, writes:0, reads:0, passes:0 });
   for (let i = 0; i < n; i++) {
     C[A[i]]++;
@@ -859,10 +474,7 @@ function generateCountingSteps(arr) {
   }
   const B = new Array(n).fill(undefined);
   for (let j = n - 1; j >= 0; j--) {
-    const val = A[j];
-    const pos = C[val] - 1;
-    B[pos] = val;
-    C[val]--;
+    const val = A[j]; const pos = C[val] - 1; B[pos] = val; C[val]--;
     result.push({ phase:'place', arr:[...A], B:[...B], C:[...C], active:j, placed:pos, msg:'Place A[<b style="color:#a78bfa">' + j + '</b>]=<b style="color:#f59e0b">' + val + '</b> → output index <b style="color:#10b981">' + pos + '</b>. C[' + val + '] decremented to ' + C[val] + '.', pseudoLine:8, reads:n+k+(n-j), writes:n+k+(n-j), passes:2 });
   }
   result.push({ phase:'done', arr:[...B], B:[...B], C:[...C], msg:'Counting Sort complete! O(n+k) = O(<b style="color:#6366f1">' + n + '+' + k + '</b>). Sorted: [<b style="color:#22c55e">' + B.join(', ') + '</b>]', pseudoLine:10, reads:n+k+n, writes:n+k+n, passes:3 });
@@ -873,32 +485,23 @@ function getDigit(num, pos) { return Math.floor(num / Math.pow(10, pos)) % 10; }
 function digitName(d) { return ['ones','tens','hundreds','thousands'][d] || ('10^' + d); }
 
 function generateRadixSteps(arr) {
-  const result = [];
-  let A = [...arr];
-  const n = A.length;
+  const result = []; let A = [...arr]; const n = A.length;
   const maxVal = Math.max(...A);
   const d = maxVal === 0 ? 1 : (Math.floor(Math.log10(maxVal)) + 1);
   let totalReads = 0, totalWrites = 0;
   result.push({ phase:'init', arr:[...A], msg:'Radix Sort: n=<b style="color:#6366f1">' + n + '</b>, max=<b style="color:#f59e0b">' + maxVal + '</b> → d=<b style="color:#a78bfa">' + d + '</b> pass(es). Each pass is a stable Counting Sort.', pseudoLine:1, reads:0, writes:0, passes:0 });
   for (let digit = 0; digit < d; digit++) {
     const C = new Array(10).fill(0);
-    // Banner step at start of each pass
     result.push({ phase:'passStart', arr:[...A], digit, msg:'<b style="color:#10b981">PASS ' + (digit+1) + ' of ' + d + '</b> — Counting Sort on <b style="color:#f59e0b">' + digitName(digit) + '</b> digit. Array before pass: [' + A.join(', ') + ']', pseudoLine:3, reads:totalReads, writes:totalWrites, passes:digit });
     for (let i = 0; i < n; i++) {
-      const dig = getDigit(A[i], digit);
-      C[dig]++;
-      totalReads++;
+      const dig = getDigit(A[i], digit); C[dig]++; totalReads++;
       result.push({ phase:'count', arr:[...A], C:[...C], active:i, digit, msg:'Pass <b style="color:#10b981">' + (digit+1) + '</b> (<b style="color:#f59e0b">' + digitName(digit) + '</b> digit): A[' + i + ']=<b style="color:#f59e0b">' + A[i] + '</b>, digit=<b style="color:#a78bfa">' + dig + '</b> → C[' + dig + ']=<b style="color:#22c55e">' + C[dig] + '</b>.', pseudoLine:9, reads:totalReads, writes:totalWrites, passes:digit });
     }
     for (let i = 1; i < 10; i++) C[i] += C[i - 1];
     result.push({ phase:'prefix', arr:[...A], C:[...C], digit, msg:'Pass <b style="color:#10b981">' + (digit+1) + '</b>: prefix sums computed over digit buckets 0–9.', pseudoLine:10, reads:totalReads, writes:totalWrites, passes:digit });
     const B = new Array(n).fill(undefined);
     for (let j = n - 1; j >= 0; j--) {
-      const dig = getDigit(A[j], digit);
-      const pos = C[dig] - 1;
-      B[pos] = A[j];
-      C[dig]--;
-      totalWrites++;
+      const dig = getDigit(A[j], digit); const pos = C[dig] - 1; B[pos] = A[j]; C[dig]--; totalWrites++;
       result.push({ phase:'place', arr:[...A], B:[...B], C:[...C], active:j, placed:pos, digit, msg:'Pass <b style="color:#10b981">' + (digit+1) + '</b>: Place A[' + j + ']=<b style="color:#f59e0b">' + A[j] + '</b> (' + digitName(digit) + ' digit=<b style="color:#a78bfa">' + dig + '</b>) → output[<b style="color:#10b981">' + pos + '</b>].', pseudoLine:12, reads:totalReads, writes:totalWrites, passes:digit+1 });
     }
     A = [...B];
@@ -916,44 +519,28 @@ function makeSVG(tag, attrs) {
   return el;
 }
 
-// ── INIT / REBUILD VIZ (called once per Build Steps) ──
+// ── INIT VIZ ──
 function initViz(n) {
   const svg = document.getElementById('viz-svg');
   svg.innerHTML = '';
-
-  // Inject CSS transitions for smooth color changes
   const style = document.createElementNS(SVG_NS, 'style');
   style.textContent = '.v-bar{transition:fill .22s ease}.v-ptr{transition:opacity .18s ease}.v-ccell{transition:fill .22s ease}';
   svg.appendChild(style);
+  vizCache.bars = []; vizCache.countCells = []; vizCache.n = n; vizCache.countLen = 0;
 
-  vizCache.bars = [];
-  vizCache.countCells = [];
-  vizCache.n = n;
-  vizCache.countLen = 0;
-
-  const W = svg.clientWidth || 600;
-  const H = svg.clientHeight || 320;
-  const barW = Math.max(8, Math.min(55, Math.floor((W * 0.9) / n) - 5));
-  const maxBarH = H * 0.40;
-  const startX = 20;
-  const baseY = H * 0.52;
-
+  const W = svg.clientWidth || 700; const H = svg.clientHeight || 400;
+  const barW = Math.max(8, Math.min(55, Math.floor((W * 0.92) / n) - 5));
+  const maxBarH = H * 0.42; const startX = 20; const baseY = H * 0.54;
   vizCache.barW = barW; vizCache.maxBarH = maxBarH;
-  vizCache.startX = startX; vizCache.baseY = baseY;
-  vizCache.W = W; vizCache.H = H;
+  vizCache.startX = startX; vizCache.baseY = baseY; vizCache.W = W; vizCache.H = H;
 
-  // Header label
   const hdr = makeSVG('text', { x: startX, y: baseY - maxBarH - 18, fill: '#94a3b8', 'font-size': '11', 'font-family': 'monospace' });
   hdr.textContent = 'Input Array A';
-  svg.appendChild(hdr);
-  vizCache.headerLabel = hdr;
+  svg.appendChild(hdr); vizCache.headerLabel = hdr;
 
-  // Phase banner (for radix)
   const banner = makeSVG('text', { x: W / 2, y: 18, 'text-anchor': 'middle', 'font-size': '11', 'font-family': 'monospace', fill: '#10b981', opacity: '0' });
-  svg.appendChild(banner);
-  vizCache.banner = banner;
+  svg.appendChild(banner); vizCache.banner = banner;
 
-  // Create bar groups
   for (let i = 0; i < n; i++) {
     const x = startX + i * (barW + 5);
     const rect = makeSVG('rect', { x, y: baseY - 4, width: barW, height: 4, rx: '3', class: 'v-bar', fill: '#6366f1' });
@@ -963,38 +550,23 @@ function initViz(n) {
     idxT.textContent = i;
     const ptr = makeSVG('text', { x: x + barW / 2, y: baseY + 40, 'text-anchor': 'middle', 'font-size': '10', fill: '#ec4899', class: 'v-ptr', opacity: '0' });
     ptr.textContent = '▲';
-    svg.appendChild(rect);
-    svg.appendChild(valT);
-    svg.appendChild(idxT);
-    svg.appendChild(ptr);
+    svg.appendChild(rect); svg.appendChild(valT); svg.appendChild(idxT); svg.appendChild(ptr);
     vizCache.bars.push({ rect, valT, idxT, ptr });
   }
 }
 
-// ── UPDATE VIZ (smooth, no innerHTML wipe) ──
+// ── UPDATE VIZ ──
 function updateViz(step) {
-  const A = step.arr;
-  const n = A.length;
-  if (!vizCache.bars.length || vizCache.n !== n) {
-    initViz(n);
-  }
-
+  const A = step.arr; const n = A.length;
+  if (!vizCache.bars.length || vizCache.n !== n) initViz(n);
   const maxVal = Math.max(...A, 1);
-  const { maxBarH, baseY, barW, startX, W, H } = vizCache;
+  const { maxBarH, baseY } = vizCache;
   const showOutput = (step.phase === 'place' || step.phase === 'done') && step.B;
-
-  // Update header
-  if (vizCache.headerLabel) {
-    vizCache.headerLabel.textContent = showOutput ? 'Output Array B' : 'Input Array A';
-  }
-
-  // Update banner
+  if (vizCache.headerLabel) vizCache.headerLabel.textContent = showOutput ? 'Output Array B' : 'Input Array A';
   if (vizCache.banner) {
-    if (step.phase === 'passStart' || step.phase === 'count' || step.phase === 'prefix' || step.phase === 'place' || step.phase === 'passEnd') {
-      if (step.digit !== undefined) {
-        vizCache.banner.textContent = '— PASS ' + (step.digit + 1) + ': Counting Sort on ' + digitName(step.digit).toUpperCase() + ' digit —';
-        vizCache.banner.setAttribute('opacity', '1');
-      }
+    if (step.digit !== undefined && step.phase !== 'done') {
+      vizCache.banner.textContent = '— PASS ' + (step.digit + 1) + ': Counting Sort on ' + digitName(step.digit).toUpperCase() + ' digit —';
+      vizCache.banner.setAttribute('opacity', '1');
     } else if (step.phase === 'done') {
       vizCache.banner.textContent = '✓ Sorted!';
       vizCache.banner.setAttribute('fill', '#22c55e');
@@ -1003,65 +575,41 @@ function updateViz(step) {
       vizCache.banner.setAttribute('opacity', '0');
     }
   }
-
-  // Update bars
   A.forEach((val, i) => {
     const drawVal = (showOutput && step.B && step.B[i] !== undefined) ? step.B[i] : val;
     const bh = Math.max(4, ((drawVal !== undefined ? drawVal : 0) / maxVal) * maxBarH);
-    const y = baseY - bh;
-
     let fill = '#6366f1';
-    if (step.phase === 'done') {
-      fill = '#22c55e';
-    } else if (step.phase === 'place') {
-      if (step.B && step.B[i] !== undefined) fill = '#10b981';
-      if (i === step.active) fill = '#f59e0b';
-    } else if ((step.phase === 'prefix') && i === step.cActive) {
-      fill = '#a78bfa';
-    } else if (i === step.active) {
-      fill = '#f59e0b';
-    }
-
+    if (step.phase === 'done') fill = '#22c55e';
+    else if (step.phase === 'place') { if (step.B && step.B[i] !== undefined) fill = '#10b981'; if (i === step.active) fill = '#f59e0b'; }
+    else if (step.phase === 'prefix' && i === step.cActive) fill = '#a78bfa';
+    else if (i === step.active) fill = '#f59e0b';
     const { rect, valT, ptr } = vizCache.bars[i];
-    rect.style.fill = fill; // CSS transition applies
-    rect.setAttribute('y', y);
+    rect.style.fill = fill;
+    rect.setAttribute('y', baseY - bh);
     rect.setAttribute('height', bh);
-
     valT.textContent = drawVal !== undefined ? String(drawVal) : '?';
     ptr.setAttribute('opacity', (i === step.active && step.phase !== 'done') ? '1' : '0');
   });
-
-  // Update count array
   updateCountCells(step);
 }
 
 function updateCountCells(step) {
   if (!step.C) {
-    // Remove old cells if present
     vizCache.countCells.forEach(({ rect, valT, idxT }) => {
       if (rect.parentNode) rect.parentNode.removeChild(rect);
       if (valT.parentNode) valT.parentNode.removeChild(valT);
       if (idxT.parentNode) idxT.parentNode.removeChild(idxT);
     });
-    vizCache.countCells = [];
-    vizCache.countLen = 0;
-    // Remove count label if exists
-    if (vizCache.countLabel && vizCache.countLabel.parentNode) {
-      vizCache.countLabel.parentNode.removeChild(vizCache.countLabel);
-      vizCache.countLabel = null;
-    }
+    vizCache.countCells = []; vizCache.countLen = 0;
+    if (vizCache.countLabel && vizCache.countLabel.parentNode) { vizCache.countLabel.parentNode.removeChild(vizCache.countLabel); vizCache.countLabel = null; }
     return;
   }
-
   const svg = document.getElementById('viz-svg');
-  const C = step.C;
-  const { W, H, startX } = vizCache;
-  const cY = H * 0.74;
+  const C = step.C; const { W, H, startX } = vizCache;
+  const cY = H * 0.76;
   const maxCells = Math.floor((W - startX * 2) / 30);
   const showLen = Math.min(C.length, maxCells);
   const cellW = Math.min(34, Math.floor((W - startX * 2) / showLen) - 2);
-
-  // Rebuild cells if count array size changed
   if (vizCache.countLen !== C.length) {
     vizCache.countCells.forEach(({ rect, valT, idxT }) => {
       if (rect.parentNode) rect.parentNode.removeChild(rect);
@@ -1069,16 +617,10 @@ function updateCountCells(step) {
       if (idxT.parentNode) idxT.parentNode.removeChild(idxT);
     });
     vizCache.countCells = [];
-
-    // Remove old label
-    if (vizCache.countLabel && vizCache.countLabel.parentNode) {
-      vizCache.countLabel.parentNode.removeChild(vizCache.countLabel);
-    }
+    if (vizCache.countLabel && vizCache.countLabel.parentNode) vizCache.countLabel.parentNode.removeChild(vizCache.countLabel);
     const lbl = makeSVG('text', { x: startX, y: cY - 12, fill: '#94a3b8', 'font-size': '10', 'font-family': 'monospace' });
     lbl.textContent = 'Count Array C  (index → value)';
-    svg.appendChild(lbl);
-    vizCache.countLabel = lbl;
-
+    svg.appendChild(lbl); vizCache.countLabel = lbl;
     for (let i = 0; i < showLen; i++) {
       const cx = startX + i * (cellW + 2);
       const rect = makeSVG('rect', { x: cx, y: cY, width: cellW, height: 22, fill: '#1a1d27', stroke: '#2e3347', 'stroke-width': 1, rx: 2, class: 'v-ccell' });
@@ -1089,7 +631,6 @@ function updateCountCells(step) {
       svg.appendChild(rect); svg.appendChild(valT); svg.appendChild(idxT);
       vizCache.countCells.push({ rect, valT, idxT });
     }
-
     if (C.length > maxCells) {
       const more = makeSVG('text', { x: startX + maxCells * (cellW + 2) + 4, y: cY + 14, fill: '#475569', 'font-size': '9', 'font-family': 'monospace' });
       more.textContent = '... +' + (C.length - maxCells) + ' more';
@@ -1097,15 +638,12 @@ function updateCountCells(step) {
     }
     vizCache.countLen = C.length;
   }
-
-  // Update cell colors and values
   vizCache.countCells.forEach(({ rect, valT }, i) => {
     valT.textContent = String(C[i]);
     let cfill = '#1a1d27';
     if (i === step.cActive) cfill = '#6366f1';
     else if (step.active !== undefined && step.arr && step.arr[step.active] === i) cfill = '#f59e0b';
-    else if (step.phase === 'place' && step.active !== undefined && step.arr && step.arr[step.active] === i) cfill = '#ec4899';
-    rect.style.fill = cfill; // CSS transition
+    rect.style.fill = cfill;
   });
 }
 
@@ -1119,10 +657,7 @@ function renderPseudo(activeLine) {
     const lnSpan = document.createElement('span'); lnSpan.className = 'ln'; lnSpan.textContent = i + 1;
     const codeSpan = document.createElement('span'); codeSpan.textContent = line.code;
     div.appendChild(lnSpan); div.appendChild(codeSpan);
-    if (line.tip) {
-      const tip = document.createElement('span'); tip.className = 'tip'; tip.textContent = line.tip;
-      div.appendChild(tip);
-    }
+    if (line.tip) { const tip = document.createElement('span'); tip.className = 'tip'; tip.textContent = line.tip; div.appendChild(tip); }
     panel.appendChild(div);
     if (i === activeLine) div.scrollIntoView({ block: 'nearest' });
   });
@@ -1131,10 +666,7 @@ function renderPseudo(activeLine) {
 // ── HISTORY TABLE ──
 function addHistoryRow(stepIdx, step) {
   const tbody = document.getElementById('history-body');
-  if (historyRows.length >= 30) {
-    historyRows.shift();
-    if (tbody.firstElementChild) tbody.removeChild(tbody.firstElementChild);
-  }
+  if (historyRows.length >= 30) { historyRows.shift(); if (tbody.firstElementChild) tbody.removeChild(tbody.firstElementChild); }
   historyRows.push(stepIdx);
   const tr = document.createElement('tr');
   tr.dataset.step = stepIdx;
@@ -1153,10 +685,7 @@ function selectAlgo(algo) {
   currentAlgo = algo;
   document.getElementById('tab-counting').classList.toggle('active', algo === 'counting');
   document.getElementById('tab-radix').classList.toggle('active', algo === 'radix');
-  reset();
-  renderPseudo(-1);
-  renderOv(algo);
-  renderCx(algo);
+  reset(); renderPseudo(-1); renderOv(algo); renderCx(algo);
 }
 function loadPreset(arr) {
   document.getElementById('custom-input').value = arr.join(', ');
@@ -1183,32 +712,22 @@ function buildSteps() {
   if (!validateInput()) return;
   const arr = getInput();
   if (arr.length === 0) { showErr('Enter at least one number.'); return; }
-  // Reset viz cache so bars are rebuilt for new array
   vizCache.bars = []; vizCache.n = 0; vizCache.countLen = 0; vizCache.countCells = [];
   steps = currentAlgo === 'counting' ? generateCountingSteps(arr) : generateRadixSteps(arr);
-  currentStep = -1;
-  historyRows = [];
+  currentStep = -1; historyRows = [];
   document.getElementById('history-body').innerHTML = '';
   document.getElementById('cnt-n').textContent = arr.length;
-  setPlaybackButtons(true);
-  setStatus('Ready');
-  stepForward();
+  setPlaybackButtons(true); setStatus('Ready'); stepForward();
 }
 function stepForward() {
   if (steps.length === 0) return;
   if (currentStep >= steps.length - 1) { setStatus('Done'); isPlaying = false; return; }
-  currentStep++;
-  applyStep(steps[currentStep]);
+  currentStep++; applyStep(steps[currentStep]);
 }
-function jumpToStep(idx) {
-  pause();
-  currentStep = idx;
-  applyStep(steps[currentStep]);
-}
+function jumpToStep(idx) { pause(); currentStep = idx; applyStep(steps[currentStep]); }
 function applyStep(step) {
-  updateViz(step);                                    // smooth persistent update
-  renderPseudo(step.pseudoLine);
-  document.getElementById('step-box').innerHTML = step.msg;  // FIX: innerHTML preserves colour tags
+  updateViz(step); renderPseudo(step.pseudoLine);
+  document.getElementById('step-box').innerHTML = step.msg;
   document.getElementById('step-counter').textContent = 'Step ' + (currentStep+1) + ' / ' + steps.length;
   document.getElementById('cnt-writes').textContent = step.writes;
   document.getElementById('cnt-reads').textContent = step.reads;
@@ -1217,37 +736,27 @@ function applyStep(step) {
   if (step.phase === 'done') setStatus('Done');
   document.getElementById('cx-n').textContent = (step.arr || []).length || 0;
   document.getElementById('cx-ops').textContent = (step.reads || 0) + (step.writes || 0);
-  if (currentAlgo === 'counting') {
-    document.getElementById('cx-k').textContent = step.C ? step.C.length - 1 : '—';
-  } else {
-    document.getElementById('cx-k').textContent = step.digit !== undefined ? step.digit + 1 : '—';
-  }
+  if (currentAlgo === 'counting') document.getElementById('cx-k').textContent = step.C ? step.C.length - 1 : '—';
+  else document.getElementById('cx-k').textContent = step.digit !== undefined ? step.digit + 1 : '—';
 }
 function play() {
   if (steps.length === 0) { buildSteps(); return; }
   if (currentStep >= steps.length - 1) return;
-  setStatus('Playing');
-  isPlaying = true;
+  setStatus('Playing'); isPlaying = true;
   function tick() {
     if (!isPlaying) return;
     stepForward();
-    if (currentStep < steps.length - 1) {
-      playTimer = setTimeout(tick, Math.max(80, 500 / speedMultiplier));
-    } else {
-      isPlaying = false;
-      setStatus('Done');
-    }
+    if (currentStep < steps.length - 1) playTimer = setTimeout(tick, Math.max(80, 500 / speedMultiplier));
+    else { isPlaying = false; setStatus('Done'); }
   }
   tick();
 }
 function pause() {
-  isPlaying = false;
-  clearTimeout(playTimer);
+  isPlaying = false; clearTimeout(playTimer);
   if (steps.length > 0 && currentStep >= 0) setStatus('Paused');
 }
 function reset() {
-  pause();
-  steps = []; currentStep = -1; historyRows = [];
+  pause(); steps = []; currentStep = -1; historyRows = [];
   vizCache.bars = []; vizCache.n = 0; vizCache.countLen = 0; vizCache.countCells = [];
   document.getElementById('history-body').innerHTML = '';
   const svg = document.getElementById('viz-svg');
@@ -1258,9 +767,7 @@ function reset() {
   document.getElementById('cnt-reads').textContent = '0';
   document.getElementById('cnt-passes').textContent = '0';
   document.getElementById('cnt-n').textContent = '0';
-  setPlaybackButtons(false);
-  setStatus('Idle');
-  renderPseudo(-1);
+  setPlaybackButtons(false); setStatus('Idle'); renderPseudo(-1);
 }
 function setStatus(s) { document.getElementById('status-label').textContent = s; }
 
@@ -1322,152 +829,7 @@ function renderCx(algo) {
     '</tbody></table>';
 }
 
-// ── GROWTH CHART ──
-function drawGrowthChart() {
-  var canvas = document.getElementById('growth-chart');
-  if (!canvas) return;
-  var maxN = parseInt(document.getElementById('gc-n-slider').value);
-  var kMult = parseInt(document.getElementById('gc-k-slider').value);
-  document.getElementById('gc-n-label').textContent = maxN;
-  document.getElementById('gc-k-label').textContent = ['n','2n','3n','4n','5n'][kMult-1];
-
-  var dpr = window.devicePixelRatio || 1;
-  var W = canvas.offsetWidth || 400;
-  var H = 240;
-  canvas.width = W * dpr; canvas.height = H * dpr;
-  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  var ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  var pad = { left: 50, right: 16, top: 16, bottom: 36 };
-  var cw = W - pad.left - pad.right;
-  var ch = H - pad.top - pad.bottom;
-
-  function opsCounting(n) { return n + n * kMult; }
-  function opsRadix(n) { var d = n <= 1 ? 1 : Math.ceil(Math.log10(n)); return d * (n + 10); }
-  function opsNlogN(n) { return n > 0 ? n * Math.log2(n) : 0; }
-  // Ω lower bound: n*log2(n) * 0.5 — same asymptotic class but visually distinct (lower line shows it's a bound, not the exact)
-  function omegaBound(n) { return n > 0 ? 0.5 * n * Math.log2(n) : 0; }
-
-  var maxOps = 0;
-  var step = Math.max(1, Math.floor(maxN/100));
-  for (var ni = 1; ni <= maxN; ni += step) {
-    maxOps = Math.max(maxOps, opsCounting(ni), opsRadix(ni), opsNlogN(ni));
-  }
-  maxOps *= 1.1;
-
-  function toX(n) { return pad.left + (n / maxN) * cw; }
-  function toY(ops) { return pad.top + (1 - ops / maxOps) * ch; }
-
-  ctx.fillStyle = '#0f1117';
-  ctx.fillRect(0, 0, W, H);
-
-  // Grid
-  ctx.strokeStyle = '#1e2235'; ctx.lineWidth = 1;
-  for (var gi = 0; gi <= 4; gi++) {
-    var gy = pad.top + (gi / 4) * ch;
-    ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(pad.left + cw, gy); ctx.stroke();
-    var lbl = Math.round((1 - gi/4) * maxOps);
-    ctx.fillStyle = '#475569'; ctx.font = '9px monospace'; ctx.textAlign = 'right';
-    ctx.fillText(lbl > 1000 ? (lbl/1000).toFixed(0)+'k' : lbl, pad.left - 5, gy + 3);
-  }
-  for (var xi = 0; xi <= 4; xi++) {
-    var gx = pad.left + (xi / 4) * cw;
-    ctx.beginPath(); ctx.moveTo(gx, pad.top); ctx.lineTo(gx, pad.top + ch); ctx.stroke();
-    ctx.fillStyle = '#475569'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
-    ctx.fillText(Math.round((xi/4)*maxN), gx, pad.top + ch + 18);
-  }
-
-  ctx.fillStyle = '#64748b'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('n (input size)', pad.left + cw/2, H - 4);
-  ctx.save(); ctx.translate(12, pad.top + ch/2); ctx.rotate(-Math.PI/2);
-  ctx.fillText('operations', 0, 0); ctx.restore();
-
-  function drawLine(fnOps, color, lw, dash) {
-    ctx.strokeStyle = color; ctx.lineWidth = lw;
-    if (dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
-    ctx.beginPath();
-    var first = true;
-    for (var n = 1; n <= maxN; n += Math.max(1, Math.floor(maxN/200))) {
-      var y = toY(fnOps(n));
-      if (first) { ctx.moveTo(toX(n), y); first = false; } else ctx.lineTo(toX(n), y);
-    }
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
-  // FIX: Draw Ω lower bound as dashed red (LOWER than the O(n log n) solid amber line)
-  drawLine(omegaBound, '#ef4444', 1.5, [5, 4]);   // Ω lower bound — dashed red, lower
-  drawLine(opsNlogN,   '#f59e0b', 2,   null);       // O(n log n) actual — solid amber, higher
-  drawLine(opsRadix,   '#10b981', 2,   null);        // Radix Sort — emerald
-  drawLine(opsCounting,'#6366f1', 2.5, null);        // Counting Sort — indigo
-}
-
-// ── COMPARISON RUNNER ──
-function runComparison() {
-  var raw = document.getElementById('run-input').value;
-  var arr = raw.split(',').map(function(s){ return parseInt(s.trim()); }).filter(function(n){ return !isNaN(n) && n >= 0; });
-  if (arr.length < 2) { alert('Please enter at least 2 numbers.'); return; }
-
-  var A = arr.slice(), n = A.length, k = Math.max.apply(null, A);
-  var csReads = 0, csWrites = 0;
-  var C = new Array(k+1).fill(0);
-  csWrites += k+1;
-  for (var i = 0; i < n; i++) { C[A[i]]++; csReads++; csWrites++; }
-  for (var i = 1; i <= k; i++) { C[i] += C[i-1]; csReads += 2; csWrites++; }
-  var B = new Array(n); csWrites += n;
-  for (var j = n-1; j >= 0; j--) { B[C[A[j]]-1] = A[j]; C[A[j]]--; csReads += 2; csWrites += 2; }
-  var csTotal = csReads + csWrites;
-
-  var QA = arr.slice(), qsComps = 0, qsSwaps = 0;
-  function qsPartition(a, lo, hi) {
-    var pivot = a[hi], ii = lo;
-    for (var jj = lo; jj < hi; jj++) {
-      qsComps++;
-      if (a[jj] <= pivot) { var tmp = a[ii]; a[ii] = a[jj]; a[jj] = tmp; qsSwaps++; ii++; }
-    }
-    var tmp = a[ii]; a[ii] = a[hi]; a[hi] = tmp; qsSwaps++;
-    return ii;
-  }
-  function quicksort(a, lo, hi) {
-    if (lo >= hi) return;
-    var p = qsPartition(a, lo, hi);
-    quicksort(a, lo, p-1); quicksort(a, p+1, hi);
-  }
-  quicksort(QA, 0, QA.length-1);
-  var qsTotal = qsComps + qsSwaps;
-  var maxTotal = Math.max(csTotal, qsTotal, 1);
-
-  document.getElementById('cs-reads').textContent = csReads;
-  document.getElementById('cs-reads').className = csTotal <= qsTotal ? 'win' : '';
-  document.getElementById('cs-writes').textContent = csWrites;
-  document.getElementById('cs-total').textContent = csTotal;
-  document.getElementById('cs-total').className = csTotal <= qsTotal ? 'win' : 'lose';
-  document.getElementById('cs-bar').style.width = Math.round((csTotal / maxTotal) * 100) + '%';
-
-  document.getElementById('qs-comps').textContent = qsComps;
-  document.getElementById('qs-swaps').textContent = qsSwaps;
-  document.getElementById('qs-total').textContent = qsTotal;
-  document.getElementById('qs-total').className = qsTotal <= csTotal ? 'win' : 'lose';
-  document.getElementById('qs-bar').style.width = Math.round((qsTotal / maxTotal) * 100) + '%';
-
-  document.getElementById('run-results').style.display = 'grid';
-  var verdict = document.getElementById('run-verdict');
-  verdict.style.display = 'block';
-  if (csTotal < qsTotal) {
-    var pct = Math.round((1 - csTotal/qsTotal)*100);
-    verdict.textContent = '✓ Counting Sort used ' + pct + '% fewer operations than Quicksort on this input (k=' + k + ', n=' + n + '). When k = O(n), integer sorting wins.';
-    verdict.style.cssText = 'display:block;margin-top:12px;padding:10px 14px;border-radius:6px;font-size:0.8rem;font-weight:600;color:#22c55e;border:1px solid rgba(34,197,94,0.25);background:rgba(34,197,94,0.06)';
-  } else {
-    var pct = Math.round((1 - qsTotal/csTotal)*100);
-    verdict.textContent = '⚠ Quicksort used ' + pct + '% fewer operations than Counting Sort on this input. k=' + k + ' is large relative to n=' + n + ' — the count array dominates.';
-    verdict.style.cssText = 'display:block;margin-top:12px;padding:10px 14px;border-radius:6px;font-size:0.8rem;font-weight:600;color:#f59e0b;border:1px solid rgba(245,158,11,0.25);background:rgba(245,158,11,0.06)';
-  }
-}
-
 // ── INIT ──
-window.addEventListener('load', function() { drawGrowthChart(); });
-window.addEventListener('resize', function() { drawGrowthChart(); });
 updateSpeed();
 renderPseudo(-1);
 renderOv('counting');
