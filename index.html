@@ -76,12 +76,25 @@ body{
 /* ─── MAIN LAYOUT ─── */
 .main{flex:1;min-height:0;display:flex;overflow:hidden}
 
-/* ─── SIDEBAR ─── */
+/* ─── SIDEBAR SPLIT LAYOUT ─── */
 .sb{
   width:375px;min-width:375px;flex-shrink:0;
   background:var(--panel);border-right:1px solid var(--bdr);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.sb-top{
+  flex-shrink:0;
+  display:flex;flex-direction:column;gap:13px;
+  padding:14px 14px 0;
+  border-bottom:1px solid var(--bdr);
+  padding-bottom:13px;
+}
+.sb-scroll{
+  flex:1;min-height:0;
   overflow-y:auto;overflow-x:hidden;
-  display:flex;flex-direction:column;gap:13px;padding:14px 14px 24px;
+  display:flex;flex-direction:column;gap:13px;
+  padding:13px 14px 24px;
 }
 .slbl{font:.57rem/1 var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .atabs{display:flex;gap:4px}
@@ -1160,13 +1173,28 @@ code{background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;
 <!-- ═══════════ SIDEBAR ═══════════ -->
 <aside class="sb">
 
-  <div>
-    <div class="slbl">Algorithm</div>
-    <div class="atabs">
-      <div class="atab on" id="tab-cs" onclick="selectAlgo('counting')">Counting Sort</div>
-      <div class="atab"    id="tab-rs" onclick="selectAlgo('radix')">Radix Sort</div>
+  <!-- ── FIXED TOP: Algorithm tabs + Overview (always visible) ── -->
+  <div class="sb-top">
+    <div>
+      <div class="slbl">Algorithm</div>
+      <div class="atabs">
+        <div class="atab on" id="tab-cs" onclick="selectAlgo('counting')">Counting Sort</div>
+        <div class="atab"    id="tab-rs" onclick="selectAlgo('radix')">Radix Sort</div>
+      </div>
     </div>
-  </div>
+
+    <!-- Overview Accordion -->
+    <div class="acc">
+      <div class="acch" onclick="toggleAcc()">
+        <div class="acch-l"><div class="acch-dot"></div><span class="acch-t" id="ov-t">Counting Sort — Overview</span></div>
+        <span class="acch-a open" id="ov-a">▼</span>
+      </div>
+      <div class="accb" id="ov-b" style="max-height:220px;overflow-y:auto"></div>
+    </div>
+  </div><!-- /sb-top -->
+
+  <!-- ── SCROLLABLE BOTTOM: all controls ── -->
+  <div class="sb-scroll">
 
   <div>
     <div class="slbl">Custom Input</div>
@@ -1234,15 +1262,6 @@ code{background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;
       <div class="li"><div class="ld" style="background:#f43f5e"></div>Comparison ⚡</div>
       <div class="li"><div class="ld" style="background:#fbbf24"></div>Swap</div>
     </div>
-  </div>
-
-  <!-- Overview Accordion -->
-  <div class="acc">
-    <div class="acch" onclick="toggleAcc()">
-      <div class="acch-l"><div class="acch-dot"></div><span class="acch-t" id="ov-t">Counting Sort — Overview</span></div>
-      <span class="acch-a open" id="ov-a">▼</span>
-    </div>
-    <div class="accb" id="ov-b"></div>
   </div>
 
   <!-- ── COMPLEXITY CARD ── -->
@@ -1315,6 +1334,8 @@ code{background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;
       <a href="javascript:void(0)" onclick="showPage('education')" class="qlink tel">📚 &nbsp;Study Guide — Examples, Paradigm, CLOs</a>
     </div>
   </div>
+
+  </div><!-- /sb-scroll -->
 
 </aside>
 
